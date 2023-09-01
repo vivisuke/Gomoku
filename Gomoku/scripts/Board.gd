@@ -25,13 +25,13 @@ func _draw():
 	for x in range(N_HORZ):
 		var l = Label.new()
 		l.text = "abcdefghijk"[x]
-		l.set_position(Vector2(ORG_X+CELL_WD*x-4, -1))
+		l.set_position(Vector2(ORG_X+CELL_WD*x-4, 4))
 		l.add_theme_color_override("font_color", Color.BLACK)
 		add_child(l)
 	for y in range(N_VERT):
 		var l = Label.new()
-		l.text = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"][y]
-		l.set_position(Vector2(2, ORG_Y+CELL_WD*y-10))
+		l.text = [" 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", "10", "11"][y]
+		l.set_position(Vector2(6, ORG_Y+CELL_WD*y-10))
 		l.add_theme_color_override("font_color", Color.BLACK)
 		add_child(l)
 	for x in range(N_HORZ):
