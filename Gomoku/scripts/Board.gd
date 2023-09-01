@@ -29,4 +29,9 @@ func _draw():
 		draw_line(Vector2(ORG_X+CELL_WD*x, ORG_Y),
 					Vector2(ORG_X+CELL_WD*x, LW_END),
 					Color.BLACK, 1)
+	draw_circle(Vector2(ORG_X+CELL_WD*2, ORG_Y+CELL_WD*2), 3, Color.BLACK)
+	draw_circle(Vector2(ORG_X+CELL_WD*8, ORG_Y+CELL_WD*2), 3, Color.BLACK)
+	draw_circle(Vector2(ORG_X+CELL_WD*2, ORG_Y+CELL_WD*8), 3, Color.BLACK)
+	draw_circle(Vector2(ORG_X+CELL_WD*8, ORG_Y+CELL_WD*8), 3, Color.BLACK)
+	draw_circle(Vector2(ORG_X+CELL_WD*5, ORG_Y+CELL_WD*5), 3, Color.BLACK)
 	pass
