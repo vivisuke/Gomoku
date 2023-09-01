@@ -23,12 +23,13 @@ func _process(delta):
 
 func _draw():
 	for x in range(N_HORZ):
+		var wd = 2.5 if x == 0 || x == N_HORZ - 1 else 1
 		draw_line(Vector2(ORG_X, ORG_Y+CELL_WD*x),
 					Vector2(RT_END, ORG_Y+CELL_WD*x),
-					Color.BLACK, 1)
+					Color.BLACK, wd)
 		draw_line(Vector2(ORG_X+CELL_WD*x, ORG_Y),
 					Vector2(ORG_X+CELL_WD*x, LW_END),
-					Color.BLACK, 1)
+					Color.BLACK, wd)
 	draw_circle(Vector2(ORG_X+CELL_WD*2, ORG_Y+CELL_WD*2), 3, Color.BLACK)
 	draw_circle(Vector2(ORG_X+CELL_WD*8, ORG_Y+CELL_WD*2), 3, Color.BLACK)
 	draw_circle(Vector2(ORG_X+CELL_WD*2, ORG_Y+CELL_WD*8), 3, Color.BLACK)
