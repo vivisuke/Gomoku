@@ -29,6 +29,17 @@ class Board:
 		if (h_black[y]&mask) != 0: return BLACK
 		if (h_white[y]&mask) != 0: return WHITE
 		return EMPTY
+	func put_color(x, y, col):
+		var mask = 1 << (N_HORZ - 1 - x)
+		if col == BLACK:
+			h_black[y] |= mask
+			h_white[y] &= ~mask
+		elif col == WHITE:
+			h_black[y] &= ~mask
+			h_white[y] |= mask
+		else:
+			h_black[y] &= ~mask
+			h_white[y] &= ~mask
 
 func _ready():
 	pass # Replace with function body.

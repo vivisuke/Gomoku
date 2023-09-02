@@ -8,6 +8,8 @@ var bd
 
 func _ready():
 	bd = g.Board.new()
+	bd.put_color(5, 5, g.BLACK)
+	bd.put_color(6, 5, g.WHITE)
 	update_board()
 	pass # Replace with function body.
 
