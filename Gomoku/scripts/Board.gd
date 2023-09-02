@@ -1,8 +1,8 @@
 ﻿extends ColorRect
 
 const BD_WIDTH = 500
-const N_HORZ = 11
-const N_VERT = 11
+const N_HORZ = g.N_HORZ
+const N_VERT = g.N_VERT
 const FRAME_WD = 38
 #const CELL_WD = (BD_WIDTH - FRAME_WD) / N_HORZ
 const CELL_WD = 42		# 42*12 = 504
