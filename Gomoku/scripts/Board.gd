@@ -1,15 +1,15 @@
-﻿extends ColorRect
+extends ColorRect
 
 const BD_WIDTH = 500
-const N_HORZ = g.N_HORZ
-const N_VERT = g.N_VERT
+var N_HORZ = g.N_HORZ
+var N_VERT = g.N_VERT
 const FRAME_WD = 38
 #const CELL_WD = (BD_WIDTH - FRAME_WD) / N_HORZ
 const CELL_WD = 42		# 42*12 = 504
 const ORG_X = CELL_WD*0.5
 const ORG_Y = CELL_WD*0.5
-const RT_END = CELL_WD*(N_HORZ-0.5)
-const LW_END = CELL_WD*(N_VERT-0.5)
+var RT_END = CELL_WD*(N_HORZ-0.5)
+var LW_END = CELL_WD*(N_VERT-0.5)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
