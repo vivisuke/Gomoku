@@ -32,14 +32,14 @@ offset_bottom = 50.0
 color = Color(0.180392, 0.309804, 0.309804, 1)
 
 [node name="Board" type="ColorRect" parent="."]
-offset_top = 200.0
-offset_right = 500.0
+offset_left = 30.0
+offset_top = 238.0
+offset_right = 492.0
 offset_bottom = 700.0
 color = Color(0.87451, 0.764706, 0.376471, 1)
 script = ExtResource("1_bcx5t")
 
 [node name="TileMap" type="TileMap" parent="Board"]
-position = Vector2(31, 31)
 tile_set = SubResource("TileSet_bfes6")
 format = 2
-layer_0/tile_data = PackedInt32Array(0, 0, 0, 65536, 1, 0, 1, 1, 0, 65537, 0, 0, 655360, 1, 0, 589824, 0, 0)
+layer_0/tile_data = PackedInt32Array(0, 0, 0, 65536, 1, 0, 1, 1, 0, 65537, 0, 0, 655360, 1, 0, 589824, 0, 0, 655370, 0, 0, 10, 1, 0)
