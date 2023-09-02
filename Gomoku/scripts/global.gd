@@ -24,22 +24,30 @@ class Board:
 		v_black.fill(0)
 		v_white.resize(N_HORZ)
 		v_white.fill(0)
+	func is_empty(x, y):
+		var mask = 1 << (N_HORZ - 1 - x)
+		return h_black[y]&mask == 0 && h_white[y]&mask == 0
 	func get_color(x, y):	# h_black, h_white のみを参照
 		var mask = 1 << (N_HORZ - 1 - x)
 		if (h_black[y]&mask) != 0: return BLACK
 		if (h_white[y]&mask) != 0: return WHITE
 		return EMPTY
-	func put_color(x, y, col):
+	func put_color(x, y, col):		# 前提：(x, y) は空欄、col：BLACK or WHITE
 		var mask = 1 << (N_HORZ - 1 - x)
 		if col == BLACK:
 			h_black[y] |= mask
-			h_white[y] &= ~mask
+			#h_white[y] &= ~mask
 		elif col == WHITE:
-			h_black[y] &= ~mask
+			#h_black[y] &= ~mask
 			h_white[y] |= mask
-		else:
-			h_black[y] &= ~mask
-			h_white[y] &= ~mask
+		#else:
+		#	h_black[y] &= ~mask
+		#	h_white[y] &= ~mask
+		# undone: 縦・斜めビットマップ更新
+	func remove_color(x, y):
+		var mask = 1 << (N_HORZ - 1 - x)
+		h_black[y] &= ~mask
+		h_white[y] &= ~mask
 		# undone: 縦・斜めビットマップ更新
 
 func _ready():
