@@ -40,6 +40,7 @@ class Board:
 		else:
 			h_black[y] &= ~mask
 			h_white[y] &= ~mask
+		# undone: 縦・斜めビットマップ更新
 
 func _ready():
 	pass # Replace with function body.
