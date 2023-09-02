@@ -173,7 +173,6 @@ script = ExtResource("1_bcx5t")
 [node name="BGTileMap" type="TileMap" parent="Board"]
 tile_set = SubResource("TileSet_my21j")
 format = 2
-layer_0/tile_data = PackedInt32Array(327685, 2, 0)
 
 [node name="Grid" type="ColorRect" parent="Board"]
 layout_mode = 0
