@@ -90,7 +90,19 @@ class Board:
 			v_black[x] |= mask
 		elif col == WHITE:
 			v_white[x] |= mask
-		# undone: 斜めビットマップ更新
+		# done: 斜めビットマップ更新
+		var t = xyToUrIxMask(x, y)
+		if t[0] >= 0:
+			if col == BLACK:
+				ur_black[t0] |= mask
+			elif col == WHITE:
+				ur_white[t0] |= mask
+		t = xyToDrIxMask(x, y)
+		if t[0] >= 0:
+			if col == BLACK:
+				dr_black[t0] |= mask
+			elif col == WHITE:
+				dr_white[t0] |= mask
 	func remove_color(x, y):
 		var mask = 1 << (N_HORZ - 1 - x)
 		h_black[y] &= ~mask
@@ -98,7 +110,15 @@ class Board:
 		mask = 1 << (N_HORZ - 1 - y)
 		v_black[x] &= ~mask
 		v_white[x] &= ~mask
-		# undone: 縦・斜めビットマップ更新
+		# done: 縦・斜めビットマップ更新
+		var t = xyToUrIxMask(x, y)
+		if t[0] >= 0:
+			ur_black[t0] &= !mask
+			ur_white[t0] &= !mask
+		t = xyToDrIxMask(x, y)
+		if t[0] >= 0:
+			dr_black[t0] &= !mask
+			dr_white[t0] &= !mask
 	func unit_test():
 		assert(xyToDrIxMask(0, 0) == [5, 0b10000000000])
 		assert(xyToDrIxMask(10, 10) == [5, 0b1])
