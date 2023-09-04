@@ -16,8 +16,8 @@ var game_started = false		# ゲーム中か？
 var next_color = g.BLACK		# 次の手番
 #var white_player = HUMAN
 #var black_player = HUMAN
-var pressedPos = Vector2(0, 0)
-var put_pos = Vector2(-1, -1)
+var pressedPos = Vector2i(0, 0)
+var put_pos = Vector2i(-1, -1)
 var prev_put_pos = Vector2(-1, -1)
 
 func _ready():
@@ -55,7 +55,7 @@ func _input(event):
 	if event is InputEventMouseButton && event.button_index == MOUSE_BUTTON_LEFT:
 		#print(event.position)
 		#print($Board/TileMapLocal.local_to_map(event.position - BOARD_ORG))
-		var pos = $Board/TileMap.local_to_map(event.position - BOARD_ORG)
+		var pos: Vector2i = $Board/TileMap.local_to_map(event.position - BOARD_ORG)
 		#print(pos)
 		#print("mouse button")
 		if event.is_pressed():
@@ -116,7 +116,9 @@ func unit_test():
 func _on_init_button_pressed():
 	if game_started: return
 	bd.clear()
-	put_pos = Vector2(-1, -1)
+	if put_pos != Vector2i(-1, -1):
+		$Board/BGTileMap.set_cell(0, put_pos, -1, Vector2i(0, 0))
+		put_pos = Vector2i(-1, -1)
 	update_view()
 func _on_start_stop_button_toggled(button_pressed):
 	game_started = button_pressed
