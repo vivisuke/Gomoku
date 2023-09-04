@@ -104,7 +104,11 @@ func unit_test():
 	assert(b2.is_five(6, 4, g.BLACK))
 
 
+func _on_init_button_pressed():
+	if game_started: return
+	bd.clear()
+	put_pos = Vector2(-1, -1)
+	update_view()
 func _on_start_stop_button_toggled(button_pressed):
 	game_started = button_pressed
 	update_next_underline()
-	pass # Replace with function body.
