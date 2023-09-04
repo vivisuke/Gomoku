@@ -30,6 +30,7 @@ func _ready():
 	#bd.put_color(5, 5, g.BLACK)
 	#bd.put_color(6, 5, g.WHITE)
 	update_view()
+	unit_test()
 	pass # Replace with function body.
 
 func update_view():
@@ -69,8 +70,35 @@ func _input(event):
 			if !bd.is_empty(pos.x, pos.y): return
 			#print(pos)
 			bd.put_color(pos.x, pos.y, next_color)
+			print("is_five = ", bd.is_five(pos.x, pos.y, next_color))
 			next_color = (g.BLACK + g.WHITE) - next_color
 			prev_put_pos = put_pos
 			put_pos = pos
 			update_view()
 	pass
+func unit_test():
+	var b2 = g.Board.new()
+	b2.put_color(0, 0, g.BLACK)
+	b2.put_color(1, 0, g.BLACK)
+	b2.put_color(2, 0, g.BLACK)
+	b2.put_color(3, 0, g.BLACK)
+	b2.put_color(4, 0, g.BLACK)
+	print("h_black[0] = %03x" % b2.h_black[0])
+	print("five" if b2.is_five(4, 0, g.BLACK) else "NOT five")
+	assert(b2.is_five(4, 0, g.BLACK))
+	b2.clear()
+	b2.put_color(0, 0, g.BLACK)
+	b2.put_color(1, 1, g.BLACK)
+	b2.put_color(2, 2, g.BLACK)
+	b2.put_color(3, 3, g.BLACK)
+	b2.put_color(4, 4, g.BLACK)
+	assert(b2.is_five(4, 4, g.BLACK))
+	b2.clear()
+	b2.put_color(10, 0, g.BLACK)
+	assert(b2.u_black[5] == 0x001)
+	b2.put_color(9, 1, g.BLACK)
+	b2.put_color(8, 2, g.BLACK)
+	b2.put_color(7, 3, g.BLACK)
+	b2.put_color(6, 4, g.BLACK)
+	print("u_black[5] = %03x" % b2.u_black[5])
+	assert(b2.is_five(6, 4, g.BLACK))

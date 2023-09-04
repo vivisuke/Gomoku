@@ -16,21 +16,32 @@ class Board:
 	var h_white = []		# 水平方向ビットマップ
 	var v_black = []		# 垂直方向ビットマップ
 	var v_white = []		# 垂直方向ビットマップ
-	var ur_black = []		# 右上方向ビットマップ
-	var ur_white = []		# 右上方向ビットマップ
-	var dr_black = []		# 右下方向ビットマップ
-	var dr_white = []		# 右下方向ビットマップ
+	var u_black = []		# 右上方向ビットマップ
+	var u_white = []		# 右上方向ビットマップ
+	var d_black = []		# 右下方向ビットマップ
+	var d_white = []		# 右下方向ビットマップ
 	func _init():
-		h_black.resize(N_VERT); h_black.fill(0)
-		h_white.resize(N_VERT); h_white.fill(0)
-		v_black.resize(N_HORZ); v_black.fill(0)
-		v_white.resize(N_HORZ); v_white.fill(0)
-		ur_black.resize(N_DIAGONAL); ur_black.fill(0)
-		ur_white.resize(N_DIAGONAL); ur_white.fill(0)
-		dr_black.resize(N_DIAGONAL); dr_black.fill(0)
-		dr_white.resize(N_DIAGONAL); dr_white.fill(0)
+		h_black.resize(N_VERT)
+		h_white.resize(N_VERT)
+		v_black.resize(N_HORZ)
+		v_white.resize(N_HORZ)
+		u_black.resize(N_DIAGONAL)
+		u_white.resize(N_DIAGONAL)
+		d_black.resize(N_DIAGONAL)
+		d_white.resize(N_DIAGONAL)
+		clear()
 		#
 		unit_test()
+	func clear():
+		h_black.fill(0)
+		h_white.fill(0)
+		v_black.fill(0)
+		v_white.fill(0)
+		u_black.fill(0)
+		u_white.fill(0)
+		d_black.fill(0)
+		d_white.fill(0)
+		
 
 	#  5  6    12
 	#	┌────────┐→x
@@ -94,15 +105,15 @@ class Board:
 		var t = xyToUrIxMask(x, y)
 		if t[0] >= 0:
 			if col == BLACK:
-				ur_black[t0] |= mask
+				u_black[t[0]] |= t[1]
 			elif col == WHITE:
-				ur_white[t0] |= mask
+				u_white[t[0]] |= t[1]
 		t = xyToDrIxMask(x, y)
 		if t[0] >= 0:
 			if col == BLACK:
-				dr_black[t0] |= mask
+				d_black[t[0]] |= t[1]
 			elif col == WHITE:
-				dr_white[t0] |= mask
+				d_white[t[0]] |= t[1]
 	func remove_color(x, y):
 		var mask = 1 << (N_HORZ - 1 - x)
 		h_black[y] &= ~mask
@@ -113,12 +124,36 @@ class Board:
 		# done: 縦・斜めビットマップ更新
 		var t = xyToUrIxMask(x, y)
 		if t[0] >= 0:
-			ur_black[t0] &= !mask
-			ur_white[t0] &= !mask
+			u_black[t[0]] &= !t[1]
+			u_white[t[0]] &= !t[1]
 		t = xyToDrIxMask(x, y)
 		if t[0] >= 0:
-			dr_black[t0] &= !mask
-			dr_white[t0] &= !mask
+			d_black[t[0]] &= !t[1]
+			d_white[t[0]] &= !t[1]
+	func is_five_sub(b, bitmap):		# b に着手後、五目並んだか？
+		var mask = (b << 5) - 1			# 0b1 → 0b11111
+		mask -= b - 1					# 0b2 → 0b111110
+		for i in range(5):
+			if (bitmap & mask) == mask: return true
+			if (mask&1) == 1: break
+			mask >>= 1
+		return false
+	func is_five(x, y, col):		# (x, y) に着手後、五目並んだか？
+		var h = 1 << (N_HORZ - 1 - x)
+		var v = 1 << (N_HORZ - 1 - y)
+		var d = xyToDrIxMask(x, y)
+		var u = xyToUrIxMask(x, y)
+		if col == BLACK:
+			if is_five_sub(h, h_black[y]): return true
+			if is_five_sub(v, v_black[x]): return true
+			if d[0] >= 0 && is_five_sub(d[1], d_black[d[0]]): return true
+			if u[0] >= 0 && is_five_sub(u[1], u_black[u[0]]): return true
+		elif col == WHITE:
+			if is_five_sub(h, h_white[y]): return true
+			if is_five_sub(v, v_white[x]): return true
+			if d[0] >= 0 && is_five_sub(d[1], d_white[d[0]]): return true
+			if u[0] >= 0 && is_five_sub(u[1], u_white[u[0]]): return true
+		return false
 	func unit_test():
 		assert(xyToDrIxMask(0, 0) == [5, 0b10000000000])
 		assert(xyToDrIxMask(10, 10) == [5, 0b1])
