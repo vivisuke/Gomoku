@@ -82,6 +82,7 @@ func on_gameover():
 	game_started = false
 	$StartStopButton.set_pressed_no_signal(false)
 	$StartStopButton.text = "Start Game"
+	$StartStopButton.icon = $StartStopButton/PlayTexture.texture
 	var c = "BLACK" if next_color == g.WHITE else "WHITE"
 	$MessLabel.text = c + " won."
 func unit_test():
@@ -122,6 +123,8 @@ func _on_start_stop_button_toggled(button_pressed):
 	if game_started:
 		next_color = g.BLACK
 		$StartStopButton.text = "Stop Game"
+		$StartStopButton.icon = $StartStopButton/StopTexture.texture
 	else:
 		$StartStopButton.text = "Start Game"
+		$StartStopButton.icon = $StartStopButton/PlayTexture.texture
 	update_next_underline()

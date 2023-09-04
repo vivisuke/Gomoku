@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://ditiwje3j3fsh"]
+[gd_scene load_steps=16 format=3 uid="uid://ditiwje3j3fsh"]
 
 [ext_resource type="Script" path="res://scripts/TitleBar.gd" id="1_3jkov"]
 [ext_resource type="Script" path="res://scripts/Board.gd" id="1_bcx5t"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://c2suld26k1ali" path="res://images/black_42.png" id="2_155xe"]
 [ext_resource type="Texture2D" uid="uid://buv5opysoy8ff" path="res://images/play_arrow_white_32.png" id="3_g71hd"]
 [ext_resource type="Texture2D" uid="uid://27onerr514r4" path="res://images/white_42.png" id="3_irbk1"]
+[ext_resource type="Texture2D" uid="uid://bt67q3bcmc8ab" path="res://images/stop_white_32.png" id="5_1f8o4"]
 [ext_resource type="Script" path="res://scripts/Grid.gd" id="9_fwb4q"]
 [ext_resource type="Texture2D" uid="uid://dlv5mpubr21oq" path="res://images/BG_42.png" id="10_tqbab"]
 
@@ -85,6 +86,21 @@ toggle_mode = true
 text = "Start Game
 "
 icon = ExtResource("3_g71hd")
+
+[node name="PlayTexture" type="TextureRect" parent="StartStopButton"]
+layout_mode = 0
+offset_left = -325.0
+offset_right = -285.0
+offset_bottom = 40.0
+texture = ExtResource("3_g71hd")
+
+[node name="StopTexture" type="TextureRect" parent="StartStopButton"]
+layout_mode = 0
+offset_left = -325.0
+offset_top = 54.0
+offset_right = -285.0
+offset_bottom = 94.0
+texture = ExtResource("5_1f8o4")
 
 [node name="BlackPlayer" type="ColorRect" parent="."]
 offset_left = 10.0
