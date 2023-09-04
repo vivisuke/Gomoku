@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://ditiwje3j3fsh"]
+[gd_scene load_steps=19 format=3 uid="uid://ditiwje3j3fsh"]
 
 [ext_resource type="Script" path="res://scripts/TitleBar.gd" id="1_3jkov"]
 [ext_resource type="Script" path="res://scripts/Board.gd" id="1_bcx5t"]
@@ -10,6 +10,9 @@
 [ext_resource type="Texture2D" uid="uid://bt67q3bcmc8ab" path="res://images/stop_white_32.png" id="5_1f8o4"]
 [ext_resource type="Script" path="res://scripts/Grid.gd" id="9_fwb4q"]
 [ext_resource type="Texture2D" uid="uid://dlv5mpubr21oq" path="res://images/BG_42.png" id="10_tqbab"]
+[ext_resource type="Texture2D" uid="uid://cr8wmdaub82ad" path="res://images/undo_black.png" id="11_w2j8t"]
+[ext_resource type="Texture2D" uid="uid://dk64tuxwhkcyo" path="res://images/undo_white.png" id="12_sjx1h"]
+[ext_resource type="Texture2D" uid="uid://hl2kdbh54uj0" path="res://images/undo_gray.png" id="13_i33cc"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wnvxq"]
 texture = ExtResource("10_tqbab")
@@ -211,6 +214,27 @@ offset_bottom = 744.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 24
 text = "Message"
+
+[node name="UndoButton" type="TextureButton" parent="."]
+offset_left = 30.0
+offset_top = 793.0
+offset_right = 78.0
+offset_bottom = 841.0
+texture_normal = ExtResource("11_w2j8t")
+texture_pressed = ExtResource("12_sjx1h")
+texture_disabled = ExtResource("13_i33cc")
+
+[node name="Label" type="Label" parent="UndoButton"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_top = 48.0
+offset_right = 48.0
+offset_bottom = 26.0
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "undo"
+horizontal_alignment = 1
 
 [connection signal="pressed" from="InitButton" to="." method="_on_init_button_pressed"]
 [connection signal="toggled" from="StartStopButton" to="." method="_on_start_stop_button_toggled"]
