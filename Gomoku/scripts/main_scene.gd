@@ -111,4 +111,8 @@ func _on_init_button_pressed():
 	update_view()
 func _on_start_stop_button_toggled(button_pressed):
 	game_started = button_pressed
+	if game_started:
+		$StartStopButton.text = "Stop Game"
+	else:
+		$StartStopButton.text = "Start Game"
 	update_next_underline()
