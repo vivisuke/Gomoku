@@ -12,7 +12,7 @@ var bd
 var rng = RandomNumberGenerator.new()
 var AI_thinking = false
 var waiting = 0;				# ウェイト中カウンタ
-var game_started = true			# ゲーム中か？
+var game_started = false		# ゲーム中か？
 var next_color = g.BLACK		# 次の手番
 #var white_player = HUMAN
 #var black_player = HUMAN
@@ -102,3 +102,9 @@ func unit_test():
 	b2.put_color(6, 4, g.BLACK)
 	print("u_black[5] = %03x" % b2.u_black[5])
 	assert(b2.is_five(6, 4, g.BLACK))
+
+
+func _on_start_stop_button_toggled(button_pressed):
+	game_started = button_pressed
+	update_next_underline()
+	pass # Replace with function body.

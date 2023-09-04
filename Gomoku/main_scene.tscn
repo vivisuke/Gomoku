@@ -71,16 +71,17 @@ text = "ver 0.001"
 [node name="InitButton" type="Button" parent="."]
 offset_left = 10.0
 offset_top = 66.0
-offset_right = 149.0
+offset_right = 160.0
 offset_bottom = 106.0
 text = "Init Board"
 icon = ExtResource("2_1eau2")
 
 [node name="StartStopButton" type="Button" parent="."]
-offset_left = 194.0
+offset_left = 185.0
 offset_top = 66.0
-offset_right = 324.0
+offset_right = 335.0
 offset_bottom = 106.0
+toggle_mode = true
 text = "Start Game
 "
 icon = ExtResource("3_g71hd")
@@ -194,3 +195,5 @@ offset_bottom = 744.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 24
 text = "Message"
+
+[connection signal="toggled" from="StartStopButton" to="." method="_on_start_stop_button_toggled"]
