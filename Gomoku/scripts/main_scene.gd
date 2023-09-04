@@ -70,12 +70,20 @@ func _input(event):
 			if !bd.is_empty(pos.x, pos.y): return
 			#print(pos)
 			bd.put_color(pos.x, pos.y, next_color)
-			print("is_five = ", bd.is_five(pos.x, pos.y, next_color))
+			var fv = bd.is_five(pos.x, pos.y, next_color)
+			print("is_five = ", fv)
 			next_color = (g.BLACK + g.WHITE) - next_color
 			prev_put_pos = put_pos
 			put_pos = pos
+			if fv: on_gameover()
 			update_view()
 	pass
+func on_gameover():
+	game_started = false
+	$StartStopButton.set_pressed_no_signal(false)
+	$StartStopButton.text = "Start Game"
+	var c = "BLACK" if next_color == g.WHITE else "WHITE"
+	$MessLabel.text = c + " won."
 func unit_test():
 	var b2 = g.Board.new()
 	b2.put_color(0, 0, g.BLACK)
@@ -112,6 +120,7 @@ func _on_init_button_pressed():
 func _on_start_stop_button_toggled(button_pressed):
 	game_started = button_pressed
 	if game_started:
+		next_color = g.BLACK
 		$StartStopButton.text = "Stop Game"
 	else:
 		$StartStopButton.text = "Start Game"
