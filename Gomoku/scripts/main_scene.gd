@@ -19,6 +19,7 @@ var next_color = g.BLACK		# 次の手番
 var pressedPos = Vector2i(0, 0)
 var put_pos = Vector2i(-1, -1)
 var prev_put_pos = Vector2(-1, -1)
+var move_hist = []				# 着手履歴
 
 func _ready():
 	#rng.randomize()		# Setups a time-based seed
@@ -29,6 +30,7 @@ func _ready():
 	bd = g.Board.new()
 	#bd.put_color(5, 5, g.BLACK)
 	#bd.put_color(6, 5, g.WHITE)
+	$UndoButton.disabled = true
 	update_view()
 	unit_test()
 	pass # Replace with function body.
@@ -70,6 +72,8 @@ func _input(event):
 			if !bd.is_empty(pos.x, pos.y): return
 			#print(pos)
 			bd.put_color(pos.x, pos.y, next_color)
+			move_hist.push_back(pos)
+			$UndoButton.disabled = false
 			var fv = bd.is_five(pos.x, pos.y, next_color)
 			print("is_five = ", fv)
 			next_color = (g.BLACK + g.WHITE) - next_color
@@ -116,6 +120,8 @@ func unit_test():
 func _on_init_button_pressed():
 	if game_started: return
 	bd.clear()
+	move_hist.clear()
+	$UndoButton.disabled = true
 	if put_pos != Vector2i(-1, -1):
 		$Board/BGTileMap.set_cell(0, put_pos, -1, Vector2i(0, 0))
 		put_pos = Vector2i(-1, -1)
