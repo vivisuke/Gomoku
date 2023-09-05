@@ -128,12 +128,12 @@ class Board:
 		# done: 縦・斜めビットマップ更新
 		var t = xyToUrIxMask(x, y)
 		if t[0] >= 0:
-			u_black[t[0]] &= !t[1]
-			u_white[t[0]] &= !t[1]
+			u_black[t[0]] &= ~t[1]
+			u_white[t[0]] &= ~t[1]
 		t = xyToDrIxMask(x, y)
 		if t[0] >= 0:
-			d_black[t[0]] &= !t[1]
-			d_white[t[0]] &= !t[1]
+			d_black[t[0]] &= ~t[1]
+			d_white[t[0]] &= ~t[1]
 	func is_five_sub(b, bitmap):		# b に着手後、五目並んだか？
 		var mask = (b << 5) - 1			# 0b1 → 0b11111
 		mask -= b - 1					# 0b2 → 0b111110

@@ -136,3 +136,14 @@ func _on_start_stop_button_toggled(button_pressed):
 		$StartStopButton.text = "Start Game"
 		$StartStopButton.icon = $StartStopButton/PlayTexture.texture
 	update_next_underline()
+
+
+func _on_undo_button_pressed():
+	if move_hist.size() < 2: return
+	var p = move_hist.pop_back()
+	bd.remove_color(p.x, p.y)
+	p = move_hist.pop_back()
+	bd.remove_color(p.x, p.y)
+	$UndoButton.disabled = move_hist.is_empty()
+	update_view()
+	pass # Replace with function body.
