@@ -46,7 +46,16 @@ func update_view():
 	if put_pos.x >= 0:
 		$Board/BGTileMap.set_cell(0, put_pos, 2, Vector2i(0, 0))
 		print("put_pos = ", put_pos)
+	if !game_started:
+		$MessLabel.text = "push [Start Game]"
+	else:
+		print_next_turn()
 	pass
+func print_next_turn():
+	if next_color == g.BLACK:
+		$MessLabel.text = "BLACK's turn"
+	else:
+		$MessLabel.text = "WHITE's turn"
 func update_next_underline():
 	$WhitePlayer/Underline.visible = game_started && next_color == g.WHITE
 	$BlackPlayer/Underline.visible = game_started && next_color == g.BLACK
@@ -120,6 +129,7 @@ func unit_test():
 func _on_init_button_pressed():
 	if game_started: return
 	bd.clear()
+	next_color = g.BLACK
 	move_hist.clear()
 	$UndoButton.disabled = true
 	if put_pos != Vector2i(-1, -1):
@@ -129,7 +139,8 @@ func _on_init_button_pressed():
 func _on_start_stop_button_toggled(button_pressed):
 	game_started = button_pressed
 	if game_started:
-		next_color = g.BLACK
+		#next_color = g.BLACK
+		print_next_turn()
 		$StartStopButton.text = "Stop Game"
 		$StartStopButton.icon = $StartStopButton/StopTexture.texture
 	else:
