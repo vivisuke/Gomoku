@@ -13,6 +13,8 @@ var rng = RandomNumberGenerator.new()
 var AI_thinking = false
 var waiting = 0;				# ウェイト中カウンタ
 var game_started = false		# ゲーム中か？
+var game_over = false			# 勝敗がついたか？
+var won_color = g.EMPTY			# 勝者
 var next_color = g.BLACK		# 次の手番
 #var white_player = HUMAN
 #var black_player = HUMAN
@@ -46,7 +48,9 @@ func update_view():
 	if put_pos.x >= 0:
 		$Board/BGTileMap.set_cell(0, put_pos, 2, Vector2i(0, 0))
 		print("put_pos = ", put_pos)
-	if !game_started:
+	if won_color != g.EMPTY:
+		$MessLabel.text = ("BLACK" if won_color == g.BLACK else "WHITE") + " won"
+	elif !game_started:
 		$MessLabel.text = "push [Start Game]"
 	else:
 		print_next_turn()
@@ -93,11 +97,13 @@ func _input(event):
 	pass
 func on_gameover():
 	game_started = false
+	game_over = true
 	$StartStopButton.set_pressed_no_signal(false)
 	$StartStopButton.text = "Start Game"
 	$StartStopButton.icon = $StartStopButton/PlayTexture.texture
-	var c = "BLACK" if next_color == g.WHITE else "WHITE"
-	$MessLabel.text = c + " won."
+	#var c = "BLACK" if next_color == g.WHITE else "WHITE"
+	#$MessLabel.text = c + " won."
+	won_color = g.BLACK if next_color == g.WHITE else g.WHITE
 func unit_test():
 	var b2 = g.Board.new()
 	b2.put_color(0, 0, g.BLACK)
@@ -130,6 +136,7 @@ func _on_init_button_pressed():
 	if game_started: return
 	bd.clear()
 	next_color = g.BLACK
+	won_color = g.EMPTY
 	move_hist.clear()
 	$UndoButton.disabled = true
 	if put_pos != Vector2i(-1, -1):
