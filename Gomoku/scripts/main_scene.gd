@@ -140,10 +140,17 @@ func _on_start_stop_button_toggled(button_pressed):
 
 func _on_undo_button_pressed():
 	if move_hist.size() < 2: return
+	$Board/BGTileMap.set_cell(0, put_pos, -1, Vector2i(0, 0))
 	var p = move_hist.pop_back()
 	bd.remove_color(p.x, p.y)
 	p = move_hist.pop_back()
 	bd.remove_color(p.x, p.y)
 	$UndoButton.disabled = move_hist.is_empty()
+	if !move_hist.is_empty():
+		put_pos = move_hist.back()
+		$Board/BGTileMap.set_cell(0, put_pos, 2, Vector2i(0, 0))
+	else:
+		put_pos = Vector2i(-1, -1)
+
 	update_view()
 	pass # Replace with function body.
