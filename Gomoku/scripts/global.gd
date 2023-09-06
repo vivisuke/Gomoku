@@ -134,29 +134,36 @@ class Board:
 		if t[0] >= 0:
 			d_black[t[0]] &= ~t[1]
 			d_white[t[0]] &= ~t[1]
-	func is_five_sub(b, bitmap):		# b に着手後、五目並んだか？
-		var mask = (b << 5) - 1			# 0b1 → 0b11111
-		mask -= b - 1					# 0b2 → 0b111110
-		for i in range(5):
-			if (bitmap & mask) == mask: return true
-			if (mask&1) == 1: break
-			mask >>= 1
-		return false
+	func is_five_sub(bitmap: int):		# 着手後、五目並んだか？
+		#var a = bitmap
+		#for i in range(4):
+		#	bitmap >>= 1
+		#	a &= bitmap
+		var a = bitmap & (bitmap>>1) & (bitmap>>2) & (bitmap>>3) & (bitmap>>4)
+		return a != 0
+	#func is_five_sub(b: int, bitmap: int):		# b に着手後、五目並んだか？
+		#var mask = (b << 5) - 1			# 0b1 → 0b11111
+		#mask -= b - 1					# 0b2 → 0b111110
+		#for i in range(5):
+		#	if (bitmap & mask) == mask: return true
+		#	if (mask&1) == 1: break
+		#	mask >>= 1
+		#return false
 	func is_five(x, y, col):		# (x, y) に着手後、五目並んだか？
 		var h = 1 << (N_HORZ - 1 - x)
 		var v = 1 << (N_HORZ - 1 - y)
 		var d = xyToDrIxMask(x, y)
 		var u = xyToUrIxMask(x, y)
 		if col == BLACK:
-			if is_five_sub(h, h_black[y]): return true
-			if is_five_sub(v, v_black[x]): return true
-			if d[0] >= 0 && is_five_sub(d[1], d_black[d[0]]): return true
-			if u[0] >= 0 && is_five_sub(u[1], u_black[u[0]]): return true
+			if is_five_sub(h_black[y]): return true
+			if is_five_sub(v_black[x]): return true
+			if d[0] >= 0 && is_five_sub(d_black[d[0]]): return true
+			if u[0] >= 0 && is_five_sub(u_black[u[0]]): return true
 		elif col == WHITE:
-			if is_five_sub(h, h_white[y]): return true
-			if is_five_sub(v, v_white[x]): return true
-			if d[0] >= 0 && is_five_sub(d[1], d_white[d[0]]): return true
-			if u[0] >= 0 && is_five_sub(u[1], u_white[u[0]]): return true
+			if is_five_sub(h_white[y]): return true
+			if is_five_sub(v_white[x]): return true
+			if d[0] >= 0 && is_five_sub(d_white[d[0]]): return true
+			if u[0] >= 0 && is_five_sub(u_white[u[0]]): return true
 		return false
 	func unit_test():
 		assert(xyToDrIxMask(0, 0) == [5, 0b10000000000])
