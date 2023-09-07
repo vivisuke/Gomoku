@@ -55,6 +55,10 @@ class Board:
 	var u_white = []		# 右上方向ビットマップ
 	var d_black = []		# 右下方向ビットマップ
 	var d_white = []		# 右下方向ビットマップ
+	var h_eval = []			# 水平方向評価値（黒から見た値）
+	var v_eval = []			# 垂直方向評価値
+	var u_eval = []			# 右上方向評価値
+	var d_eval = []			# 右下方向評価値
 	func _init():
 		h_black.resize(N_VERT)
 		h_white.resize(N_VERT)
@@ -64,6 +68,10 @@ class Board:
 		u_white.resize(N_DIAGONAL)
 		d_black.resize(N_DIAGONAL)
 		d_white.resize(N_DIAGONAL)
+		h_eval.resize(N_VERT)
+		v_eval.resize(N_HORZ)
+		u_eval.resize(N_DIAGONAL)
+		d_eval.resize(N_DIAGONAL)
 		clear()
 		#
 		unit_test()
@@ -77,6 +85,10 @@ class Board:
 		u_white.fill(0)
 		d_black.fill(0)
 		d_white.fill(0)
+		h_eval.fill(0)
+		v_eval.fill(0)
+		u_eval.fill(0)
+		d_eval.fill(0)
 		
 
 	#  5  6    12
@@ -91,13 +103,13 @@ class Board:
 	#   │        ＼…＼＼│  
 	#   └────────┘  
 	#   ↓y
-	func xyToDrIxMask(x, y) -> Array:	# return [ix, mask]
+	func xyToDrIxMask(x, y) -> Array:	# return [ix, mask, nbit]
 		var ix = x - y + 5
 		if ix < 0 || ix > 12: return [-1, 0]
 		if ix <= 5:
-			return [ix, 1<<(g.N_HORZ-1-x+(ix-5))]
+			return [ix, 1<<(g.N_HORZ-1-x+(ix-5)), 6+ix]
 		else:
-			return [ix, 1<<(g.N_HORZ-1-y-(ix-5))]
+			return [ix, 1<<(g.N_HORZ-1-y-(ix-5)), 16-ix]
 
 	#             0         5
 	#	┌────────┐→x
@@ -111,13 +123,13 @@ class Board:
 	#   │／／…／        │  
 	#   └────────┘  
 	#   ↓y
-	func xyToUrIxMask(x, y) -> Array:	# return [ix, mask]
+	func xyToUrIxMask(x, y) -> Array:	# return [ix, mask, nbit]
 		var ix = x + y - 10 + 5
 		if ix < 0 || ix > 12: return [-1, 0]
 		if ix <= 5:
-			return [ix, 1<<(g.N_HORZ-1-x+(ix-5))]
+			return [ix, 1<<(g.N_HORZ-1-x+(ix-5)), 6+ix]
 		else:
-			return [ix, 1<<(y-(ix-5))]
+			return [ix, 1<<(y-(ix-5)), 16-ix]
 	func is_empty(x, y):	# h_black, h_white のみを参照
 		var mask = 1 << (N_HORZ - 1 - x)
 		return h_black[y]&mask == 0 && h_white[y]&mask == 0
@@ -168,6 +180,42 @@ class Board:
 		if t[0] >= 0:
 			d_black[t[0]] &= ~t[1]
 			d_white[t[0]] &= ~t[1]
+	func eval_bitmap(black, white, nbit):		# bitmap（下位 nbit）を評価
+		var ev = 0
+		for i in range(nbit - 4):
+			var b5 = black & 0x1f
+			var w5 = white & 0x1f
+			if b5 != 0:
+				if w5 == 0:
+					ev += evtable[b5]
+				else:
+					pass	# 黒白両方ある場合は、評価値: 0
+			else:
+				if w5 != 0:
+					ev -= evtable[w5]
+				else:
+					pass	# 黒白両方空欄のみの場合は、評価値: 0
+			black >>= 1
+			white >>= 1
+		return ev
+	func eval_putxy(x, y):			# (x, y) に着手した場合の差分評価
+		h_eval[y] = eval_bitmap(h_black[y], h_white[y], N_HORZ)
+		v_eval[x] = eval_bitmap(v_black[x], v_white[x], N_VERT)
+		var t = xyToUrIxMask(x, y)
+		if t[0] >= 0:
+			u_eval[t[0]] = eval_bitmap(u_black[t[0]], u_white[t[0]], t[2])
+		t = xyToDrIxMask(x, y)
+		if t[0] >= 0:
+			d_eval[t[0]] = eval_bitmap(d_black[t[0]], d_white[t[0]], t[2])
+		# undone: 差分計算
+		var ev = 0
+		for i in range(N_HORZ):
+			ev += h_eval[i]
+			ev += v_eval[i]
+		for i in range(N_DIAGONAL):
+			ev += u_eval[i]
+			ev += d_eval[i]
+		return ev
 	func is_five_sub(bitmap: int):		# 着手後、五目並んだか？
 		#var a = bitmap
 		#for i in range(4):
@@ -199,25 +247,50 @@ class Board:
 			if d[0] >= 0 && is_five_sub(d_white[d[0]]): return true
 			if u[0] >= 0 && is_five_sub(u_white[u[0]]): return true
 		return false
+	func print():
+		for y in range(N_VERT):
+			var txt = ""
+			var mask = 1 << 10
+			for i in range(N_HORZ):
+				if (h_black[y] & mask) != 0: txt += "●"
+				elif (h_white[y] & mask) != 0: txt += "◯"
+				else: txt += "・"
+				mask >>= 1
+			print(txt)
+	func print_eval(next_color):
+		for y in range(N_VERT):
+			var txt = ""
+			var mask = 1 << 10
+			for x in range(N_HORZ):
+				if (h_black[y] & mask) != 0: txt += "  ●"
+				elif (h_white[y] & mask) != 0: txt += "  ◯"
+				else:
+					put_color(x, y, next_color)
+					var ev = eval_putxy(x, y)
+					txt += ("%4d" % ev)
+					remove_color(x, y)
+					eval_putxy(x, y)
+				mask >>= 1
+			print(txt)
 	func unit_test():
-		assert(xyToDrIxMask(0, 0) == [5, 0b10000000000])
-		assert(xyToDrIxMask(10, 10) == [5, 0b1])
-		assert(xyToDrIxMask(0, 1) == [4, 0b01000000000])
-		assert(xyToDrIxMask(9, 10) == [4, 0b1])
-		assert(xyToDrIxMask(0, 2) == [3, 0b00100000000])
-		assert(xyToDrIxMask(8, 10) == [3, 0b1])
-		assert(xyToDrIxMask(1, 0) == [6, 0b01000000000])
-		assert(xyToDrIxMask(10, 9) == [6, 0b1])
+		assert(xyToDrIxMask(0, 0) == [5, 0b10000000000, 11])
+		assert(xyToDrIxMask(10, 10) == [5, 0b1, 11])
+		assert(xyToDrIxMask(0, 1) == [4, 0b01000000000, 10])
+		assert(xyToDrIxMask(9, 10) == [4, 0b1, 10])
+		assert(xyToDrIxMask(0, 2) == [3, 0b00100000000, 9])
+		assert(xyToDrIxMask(8, 10) == [3, 0b1, 9])
+		assert(xyToDrIxMask(1, 0) == [6, 0b01000000000, 10])
+		assert(xyToDrIxMask(10, 9) == [6, 0b1, 10])
 		#
-		assert(xyToUrIxMask(10, 0) == [5, 0b1])
-		assert(xyToUrIxMask(0, 10) == [5, 0b10000000000])
-		assert(xyToUrIxMask(9, 0) == [4, 0b1])
-		assert(xyToUrIxMask(0, 9) == [4, 0b01000000000])
-		assert(xyToUrIxMask(8, 0) == [3, 0b1])
-		assert(xyToUrIxMask(0, 8) == [3, 0b00100000000])
-		assert(xyToUrIxMask(10, 1) == [6, 0b1])
-		assert(xyToUrIxMask(1, 10) == [6, 0b01000000000])
-		assert(xyToUrIxMask(10, 2) == [7, 0b1])
+		assert(xyToUrIxMask(10, 0) == [5, 0b1, 11])
+		assert(xyToUrIxMask(0, 10) == [5, 0b10000000000, 11])
+		assert(xyToUrIxMask(9, 0) == [4, 0b1, 10])
+		assert(xyToUrIxMask(0, 9) == [4, 0b01000000000, 10])
+		assert(xyToUrIxMask(8, 0) == [3, 0b1, 9])
+		assert(xyToUrIxMask(0, 8) == [3, 0b00100000000, 9])
+		assert(xyToUrIxMask(10, 1) == [6, 0b1, 10])
+		assert(xyToUrIxMask(1, 10) == [6, 0b01000000000, 10])
+		assert(xyToUrIxMask(10, 2) == [7, 0b1, 9])
 
 func _ready():
 	pass # Replace with function body.

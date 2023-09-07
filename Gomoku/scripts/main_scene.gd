@@ -1,5 +1,8 @@
 extends Node2D
 
+enum {
+	HUMAN = 0, AI_RANDOM, AI_DEPTH_1, AI_DEPTH_2, AI_DEPTH_3, 
+}
 var N_HORZ = g.N_HORZ
 var N_VERT = g.N_VERT
 var N_CELLS = N_HORZ*N_VERT
@@ -16,8 +19,8 @@ var game_started = false		# ゲーム中か？
 var game_over = false			# 勝敗がついたか？
 var won_color = g.EMPTY			# 勝者
 var next_color = g.BLACK		# 次の手番
-#var white_player = HUMAN
-#var black_player = HUMAN
+var white_player = HUMAN
+var black_player = HUMAN
 var pressedPos = Vector2i(0, 0)
 var put_pos = Vector2i(-1, -1)
 var prev_put_pos = Vector2(-1, -1)
@@ -64,6 +67,9 @@ func update_next_underline():
 	$WhitePlayer/Underline.visible = game_started && next_color == g.WHITE
 	$BlackPlayer/Underline.visible = game_started && next_color == g.BLACK
 func _process(delta):
+	if game_started && !AI_thinking:
+		AI_thinking = true
+		#AI_thinking = false
 	pass
 func _input(event):
 	if !game_started: return
@@ -85,6 +91,8 @@ func _input(event):
 			if !bd.is_empty(pos.x, pos.y): return
 			#print(pos)
 			bd.put_color(pos.x, pos.y, next_color)
+			var ev = bd.eval_putxy(pos.x, pos.y)
+			print("ev = ", ev)
 			move_hist.push_back(pos)
 			$UndoButton.disabled = false
 			var fv = bd.is_five(pos.x, pos.y, next_color)
@@ -94,6 +102,7 @@ func _input(event):
 			put_pos = pos
 			if fv: on_gameover()
 			update_view()
+			bd.print_eval(next_color)
 	pass
 func on_gameover():
 	game_started = false
@@ -161,8 +170,10 @@ func _on_undo_button_pressed():
 	$Board/BGTileMap.set_cell(0, put_pos, -1, Vector2i(0, 0))
 	var p = move_hist.pop_back()
 	bd.remove_color(p.x, p.y)
+	bd.eval_putxy(p.x, p.y)
 	p = move_hist.pop_back()
 	bd.remove_color(p.x, p.y)
+	bd.eval_putxy(p.x, p.y)
 	$UndoButton.disabled = move_hist.is_empty()
 	if !move_hist.is_empty():
 		put_pos = move_hist.back()
@@ -171,4 +182,14 @@ func _on_undo_button_pressed():
 		put_pos = Vector2i(-1, -1)
 
 	update_view()
+	pass # Replace with function body.
+
+
+func _on_black_player_selected(index):
+	black_player = index
+	pass # Replace with function body.
+
+
+func _on_white_player_selected(index):
+	white_player = index
 	pass # Replace with function body.
