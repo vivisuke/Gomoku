@@ -96,7 +96,7 @@ func _input(event):
 			if !bd.is_empty(pos.x, pos.y): return
 			#print(pos)
 			do_put(pos.x, pos.y)
-			bd.print_eval(next_color)
+			bd.print_eval_ndiff(next_color)
 	pass
 func do_put(x, y):
 	bd.put_color(x, y, next_color)
@@ -158,6 +158,8 @@ func unit_test():
 	#
 	b2.clear()
 	assert(b2.eval == 0)
+	b2.print_eval_ndiff(g.BLACK)
+	print("eval = ", b2.eval)
 	b2.put_color(4, 4, g.BLACK)
 	print("eval = ", b2.eval)
 	b2.put_color(5, 5, g.WHITE)

@@ -186,7 +186,8 @@ class Board:
 			d_white[t[0]] &= ~t[1]
 		eval_putxy(x, y, EMPTY)
 	func is_forced(b5):
-		return b5 == 0b01110 || b5 == 0b01111 || b5 == 0b11110
+		return (b5 == 0b01110 || b5 == 0b01111 || b5 == 0b10111 ||
+				b5 == 0b11011 || b5 == 0b11101 || b5 == 0b11110)
 	func eval_bitmap(black, white, nbit, nxcol):		# bitmap（下位 nbit）を評価
 		var ev = 0
 		for i in range(nbit - 4):
@@ -195,14 +196,14 @@ class Board:
 			if b5 != 0:
 				if w5 == 0:
 					ev += evtable[b5]
-					if nxcol == WHITE && is_forced(b5):
+					if nxcol == BLACK && is_forced(b5):
 						ev += evtable[b5]
 				else:
 					pass	# 黒白両方ある場合は、評価値: 0
 			else:
 				if w5 != 0:
 					ev -= evtable[w5]
-					if nxcol == BLACK && is_forced(w5):
+					if nxcol == WHITE && is_forced(w5):
 						ev -= evtable[w5]
 				else:
 					pass	# 黒白両方空欄のみの場合は、評価値: 0
