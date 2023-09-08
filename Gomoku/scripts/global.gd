@@ -47,6 +47,7 @@ class Board:
 		9999,	# ●●●●●
 	]
 	var nput
+	var eval = 0			# 評価値
 	var h_black = []		# 水平方向ビットマップ
 	var h_white = []		# 水平方向ビットマップ
 	var v_black = []		# 垂直方向ビットマップ
@@ -77,6 +78,7 @@ class Board:
 		unit_test()
 	func clear():
 		nput = 0
+		eval = 0
 		h_black.fill(0)
 		h_white.fill(0)
 		v_black.fill(0)
@@ -138,6 +140,7 @@ class Board:
 		if (h_black[y]&mask) != 0: return BLACK
 		if (h_white[y]&mask) != 0: return WHITE
 		return EMPTY
+	# 着手・盤面評価
 	func put_color(x, y, col):		# 前提：(x, y) は空欄、col：BLACK or WHITE
 		nput += 1
 		var mask = 1 << (N_HORZ - 1 - x)
@@ -163,6 +166,7 @@ class Board:
 				d_black[t[0]] |= t[1]
 			elif col == WHITE:
 				d_white[t[0]] |= t[1]
+		eval_putxy(x, y)	# 結果は eval に格納される
 	func remove_color(x, y):
 		nput -= 1
 		var mask = 1 << (N_HORZ - 1 - x)
@@ -180,6 +184,7 @@ class Board:
 		if t[0] >= 0:
 			d_black[t[0]] &= ~t[1]
 			d_white[t[0]] &= ~t[1]
+		eval_putxy(x, y)
 	func eval_bitmap(black, white, nbit):		# bitmap（下位 nbit）を評価
 		var ev = 0
 		for i in range(nbit - 4):
@@ -199,23 +204,31 @@ class Board:
 			white >>= 1
 		return ev
 	func eval_putxy(x, y):			# (x, y) に着手した場合の差分評価
+		eval -= h_eval[y]
 		h_eval[y] = eval_bitmap(h_black[y], h_white[y], N_HORZ)
+		eval += h_eval[y]
+		eval -= v_eval[x]
 		v_eval[x] = eval_bitmap(v_black[x], v_white[x], N_VERT)
+		eval += v_eval[x]
 		var t = xyToUrIxMask(x, y)
 		if t[0] >= 0:
+			eval -= u_eval[t[0]]
 			u_eval[t[0]] = eval_bitmap(u_black[t[0]], u_white[t[0]], t[2])
+			eval += u_eval[t[0]]
 		t = xyToDrIxMask(x, y)
 		if t[0] >= 0:
+			eval -= d_eval[t[0]]
 			d_eval[t[0]] = eval_bitmap(d_black[t[0]], d_white[t[0]], t[2])
-		# undone: 差分計算
-		var ev = 0
-		for i in range(N_HORZ):
-			ev += h_eval[i]
-			ev += v_eval[i]
-		for i in range(N_DIAGONAL):
-			ev += u_eval[i]
-			ev += d_eval[i]
-		return ev
+			eval += d_eval[t[0]]
+		# done: 差分計算
+		#var ev = 0
+		#for i in range(N_HORZ):
+		#	ev += h_eval[i]
+		#	ev += v_eval[i]
+		#for i in range(N_DIAGONAL):
+		#	ev += u_eval[i]
+		#	ev += d_eval[i]
+		return eval
 	func is_five_sub(bitmap: int):		# 着手後、五目並んだか？
 		#var a = bitmap
 		#for i in range(4):
@@ -247,6 +260,29 @@ class Board:
 			if d[0] >= 0 && is_five_sub(d_white[d[0]]): return true
 			if u[0] >= 0 && is_five_sub(u_white[u[0]]): return true
 		return false
+	func minmax(next_color):
+		var op = Vector2i(-1, -1)
+		if next_color == BLACK:		# 黒番
+			var mx = -99999
+			for y in range(N_VERT):
+				for x in range(N_HORZ):
+					if is_empty(x, y):
+						put_color(x, y, next_color)
+						if eval > mx:
+							mx = eval
+							op = Vector2i(x, y)
+						remove_color(x, y)
+		else:						# 白番
+			var mn = 99999
+			for y in range(N_VERT):
+				for x in range(N_HORZ):
+					if is_empty(x, y):
+						put_color(x, y, next_color)
+						if eval < mn:
+							mn = eval
+							op = Vector2i(x, y)
+						remove_color(x, y)
+		return op
 	func print():
 		for y in range(N_VERT):
 			var txt = ""
@@ -262,14 +298,14 @@ class Board:
 			var txt = ""
 			var mask = 1 << 10
 			for x in range(N_HORZ):
-				if (h_black[y] & mask) != 0: txt += "  ●"
-				elif (h_white[y] & mask) != 0: txt += "  ◯"
+				if (h_black[y] & mask) != 0: txt += "   X"
+				elif (h_white[y] & mask) != 0: txt += "   O"
 				else:
 					put_color(x, y, next_color)
-					var ev = eval_putxy(x, y)
-					txt += ("%4d" % ev)
+					#var ev = eval_putxy(x, y)
+					txt += ("%4d" % eval)
 					remove_color(x, y)
-					eval_putxy(x, y)
+					#eval_putxy(x, y)
 				mask >>= 1
 			print(txt)
 	func unit_test():

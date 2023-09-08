@@ -67,9 +67,14 @@ func update_next_underline():
 	$WhitePlayer/Underline.visible = game_started && next_color == g.WHITE
 	$BlackPlayer/Underline.visible = game_started && next_color == g.BLACK
 func _process(delta):
-	if game_started && !AI_thinking:
+	if( game_started && !AI_thinking &&
+			(next_color == g.WHITE && white_player >= AI_RANDOM ||
+			next_color == g.BLACK && black_player >= AI_RANDOM) ):
+		# AI の手番
 		AI_thinking = true
-		#AI_thinking = false
+		var op = bd.minmax(next_color)
+		do_put(op.x, op.y)
+		AI_thinking = false
 	pass
 func _input(event):
 	if !game_started: return
@@ -90,20 +95,22 @@ func _input(event):
 			if pos.x < 0 || pos.x >= N_HORZ || pos.y < 0 || pos.y > N_VERT: return
 			if !bd.is_empty(pos.x, pos.y): return
 			#print(pos)
-			bd.put_color(pos.x, pos.y, next_color)
-			var ev = bd.eval_putxy(pos.x, pos.y)
-			print("ev = ", ev)
-			move_hist.push_back(pos)
-			$UndoButton.disabled = false
-			var fv = bd.is_five(pos.x, pos.y, next_color)
-			print("is_five = ", fv)
-			next_color = (g.BLACK + g.WHITE) - next_color
-			prev_put_pos = put_pos
-			put_pos = pos
-			if fv: on_gameover()
-			update_view()
+			do_put(pos.x, pos.y)
 			bd.print_eval(next_color)
 	pass
+func do_put(x, y):
+	bd.put_color(x, y, next_color)
+	var pos = Vector2i(x, y)
+	move_hist.push_back(pos)
+	$UndoButton.disabled = false
+	var fv = bd.is_five(x, y, next_color)
+	print("is_five = ", fv)
+	next_color = (g.BLACK + g.WHITE) - next_color
+	prev_put_pos = put_pos
+	put_pos = pos
+	if fv: on_gameover()
+	update_view()
+	#bd.print_eval(next_color)
 func on_gameover():
 	game_started = false
 	game_over = true
@@ -170,10 +177,10 @@ func _on_undo_button_pressed():
 	$Board/BGTileMap.set_cell(0, put_pos, -1, Vector2i(0, 0))
 	var p = move_hist.pop_back()
 	bd.remove_color(p.x, p.y)
-	bd.eval_putxy(p.x, p.y)
+	#bd.eval_putxy(p.x, p.y)
 	p = move_hist.pop_back()
 	bd.remove_color(p.x, p.y)
-	bd.eval_putxy(p.x, p.y)
+	#bd.eval_putxy(p.x, p.y)
 	$UndoButton.disabled = move_hist.is_empty()
 	if !move_hist.is_empty():
 		put_pos = move_hist.back()
