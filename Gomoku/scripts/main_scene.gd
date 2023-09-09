@@ -35,7 +35,7 @@ func _ready():
 	bd = g.Board.new()
 	#bd.put_color(5, 5, g.BLACK)
 	#bd.put_color(6, 5, g.WHITE)
-	$UndoButton.disabled = true
+	$HBC/UndoButton.disabled = true
 	update_view()
 	unit_test()
 	pass # Replace with function body.
@@ -46,7 +46,7 @@ func update_view():
 			var c:int = bd.get_color(x, y)
 			$Board/TileMap.set_cell(0, Vector2(x, y), c-1, Vector2i(0, 0))
 	if bd.n_space == 0:
-		on_gameover()
+		on_gameover(g.EMPTY)
 		return
 	update_next_underline()
 	if prev_put_pos.x >= 0:
@@ -56,6 +56,8 @@ func update_view():
 		print("put_pos = ", put_pos)
 	if won_color != g.EMPTY:
 		$MessLabel.text = ("BLACK" if won_color == g.BLACK else "WHITE") + " won"
+	elif bd.n_space == 0:
+		$MessLabel.text = "draw"
 	elif !game_started:
 		$MessLabel.text = "push [Start Game]"
 	else:
@@ -105,16 +107,18 @@ func do_put(x, y):
 	bd.put_color(x, y, next_color)
 	var pos = Vector2i(x, y)
 	move_hist.push_back(pos)
-	$UndoButton.disabled = false
+	$HBC/UndoButton.disabled = false
+	var sx = bd.is_six(x, y, next_color)
+	print("is_six = ", sx)
 	var fv = bd.is_five(x, y, next_color)
 	print("is_five = ", fv)
-	next_color = (g.BLACK + g.WHITE) - next_color
 	prev_put_pos = put_pos
 	put_pos = pos
-	if fv: on_gameover()
+	if fv: on_gameover(next_color)
+	next_color = (g.BLACK + g.WHITE) - next_color
 	update_view()
 	#bd.print_eval(next_color)
-func on_gameover():
+func on_gameover(wcol):
 	game_started = false
 	game_over = true
 	$StartStopButton.set_pressed_no_signal(false)
@@ -122,7 +126,8 @@ func on_gameover():
 	$StartStopButton.icon = $StartStopButton/PlayTexture.texture
 	#var c = "BLACK" if next_color == g.WHITE else "WHITE"
 	#$MessLabel.text = c + " won."
-	won_color = g.BLACK if next_color == g.WHITE else g.WHITE
+	#won_color = g.BLACK if next_color == g.WHITE else g.WHITE
+	won_color = wcol
 	$BlackPlayer/OptionButton.disabled = false
 	$WhitePlayer/OptionButton.disabled = false
 func unit_test():
@@ -182,7 +187,7 @@ func _on_init_button_pressed():
 	next_color = g.BLACK
 	won_color = g.EMPTY
 	move_hist.clear()
-	$UndoButton.disabled = true
+	$HBC/UndoButton.disabled = true
 	if put_pos != Vector2i(-1, -1):
 		$Board/BGTileMap.set_cell(0, put_pos, -1, Vector2i(0, 0))
 		put_pos = Vector2i(-1, -1)
@@ -213,7 +218,7 @@ func _on_undo_button_pressed():
 	p = move_hist.pop_back()
 	bd.remove_color(p.x, p.y)
 	#bd.eval_putxy(p.x, p.y)
-	$UndoButton.disabled = move_hist.is_empty()
+	$HBC/UndoButton.disabled = move_hist.is_empty()
 	if !move_hist.is_empty():
 		put_pos = move_hist.back()
 		$Board/BGTileMap.set_cell(0, put_pos, 2, Vector2i(0, 0))

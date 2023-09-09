@@ -322,6 +322,25 @@ class Board:
 			if d[0] >= 0 && is_five_sub(d_white[d[0]]): return true
 			if u[0] >= 0 && is_five_sub(u_white[u[0]]): return true
 		return false
+	func is_six_sub(bitmap: int):		# 着手後、六目並んだか？
+		var a = bitmap & (bitmap>>1) & (bitmap>>2) & (bitmap>>3) & (bitmap>>4) & (bitmap>>5)
+		return a != 0
+	func is_six(x, y, col):		# (x, y) に着手後、六目並んだか？
+		var h = 1 << (N_HORZ - 1 - x)
+		var v = 1 << (N_HORZ - 1 - y)
+		var d = xyToDrIxMask(x, y)
+		var u = xyToUrIxMask(x, y)
+		if col == BLACK:
+			if is_six_sub(h_black[y]): return true
+			if is_six_sub(v_black[x]): return true
+			if d[0] >= 0 && is_six_sub(d_black[d[0]]): return true
+			if u[0] >= 0 && is_six_sub(u_black[u[0]]): return true
+		elif col == WHITE:
+			if is_six_sub(h_white[y]): return true
+			if is_six_sub(v_white[x]): return true
+			if d[0] >= 0 && is_six_sub(d_white[d[0]]): return true
+			if u[0] >= 0 && is_six_sub(u_white[u[0]]): return true
+		return false
 	func put_minmax(next_color):
 		#var op = Vector2i(-1, -1)
 		var lst = []

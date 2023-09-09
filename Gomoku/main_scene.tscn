@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://ditiwje3j3fsh"]
+[gd_scene load_steps=25 format=3 uid="uid://ditiwje3j3fsh"]
 
 [ext_resource type="Script" path="res://scripts/TitleBar.gd" id="1_3jkov"]
 [ext_resource type="Script" path="res://scripts/Board.gd" id="1_bcx5t"]
@@ -13,6 +13,12 @@
 [ext_resource type="Texture2D" uid="uid://cr8wmdaub82ad" path="res://images/undo_black.png" id="11_w2j8t"]
 [ext_resource type="Texture2D" uid="uid://dk64tuxwhkcyo" path="res://images/undo_white.png" id="12_sjx1h"]
 [ext_resource type="Texture2D" uid="uid://hl2kdbh54uj0" path="res://images/undo_gray.png" id="13_i33cc"]
+[ext_resource type="Texture2D" uid="uid://bkd5kj0qv03wg" path="res://images/empty24.png" id="14_yxefo"]
+[ext_resource type="Texture2D" uid="uid://b4bxgbdht6gxe" path="res://images/skip_previous_black.png" id="15_bad0q"]
+[ext_resource type="Texture2D" uid="uid://dofaqkeomdoj7" path="res://images/back_arrow_black.png" id="16_s3adq"]
+[ext_resource type="Texture2D" uid="uid://cxyoe78etfhmu" path="res://images/play_arrow_black.png" id="17_xg3s2"]
+[ext_resource type="Texture2D" uid="uid://bwiko8uoxvi10" path="res://images/skip_next_black.png" id="18_lm25u"]
+[ext_resource type="Texture2D" uid="uid://cr7rul86x0yb0" path="res://images/rule_black.png" id="19_0xbsf"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wnvxq"]
 texture = ExtResource("10_tqbab")
@@ -215,16 +221,19 @@ theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 24
 text = "Message"
 
-[node name="UndoButton" type="TextureButton" parent="."]
-offset_left = 30.0
-offset_top = 793.0
-offset_right = 78.0
-offset_bottom = 841.0
+[node name="HBC" type="HBoxContainer" parent="."]
+offset_top = 790.0
+offset_right = 500.0
+offset_bottom = 838.0
+alignment = 1
+
+[node name="UndoButton" type="TextureButton" parent="HBC"]
+layout_mode = 2
 texture_normal = ExtResource("11_w2j8t")
 texture_pressed = ExtResource("12_sjx1h")
 texture_disabled = ExtResource("13_i33cc")
 
-[node name="Label" type="Label" parent="UndoButton"]
+[node name="Label" type="Label" parent="HBC/UndoButton"]
 layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
@@ -236,8 +245,115 @@ theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "undo"
 horizontal_alignment = 1
 
+[node name="Space1" type="TextureRect" parent="HBC"]
+layout_mode = 2
+texture = ExtResource("14_yxefo")
+
+[node name="FirstButton" type="TextureButton" parent="HBC"]
+layout_mode = 2
+texture_normal = ExtResource("15_bad0q")
+
+[node name="Label" type="Label" parent="HBC/FirstButton"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_top = 48.0
+offset_right = 48.0
+offset_bottom = 26.0
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "first"
+horizontal_alignment = 1
+
+[node name="Space2" type="TextureRect" parent="HBC"]
+layout_mode = 2
+texture = ExtResource("14_yxefo")
+
+[node name="BackButton" type="TextureButton" parent="HBC"]
+layout_mode = 2
+texture_normal = ExtResource("16_s3adq")
+
+[node name="Label" type="Label" parent="HBC/BackButton"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_top = 48.0
+offset_right = 48.0
+offset_bottom = 26.0
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "back"
+horizontal_alignment = 1
+
+[node name="Space3" type="TextureRect" parent="HBC"]
+layout_mode = 2
+texture = ExtResource("14_yxefo")
+
+[node name="ForwardButton" type="TextureButton" parent="HBC"]
+layout_mode = 2
+texture_normal = ExtResource("17_xg3s2")
+
+[node name="Label" type="Label" parent="HBC/ForwardButton"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_top = 48.0
+offset_right = 48.0
+offset_bottom = 26.0
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "fwd"
+horizontal_alignment = 1
+
+[node name="Space4" type="TextureRect" parent="HBC"]
+layout_mode = 2
+texture = ExtResource("14_yxefo")
+
+[node name="LastButton" type="TextureButton" parent="HBC"]
+layout_mode = 2
+texture_normal = ExtResource("18_lm25u")
+
+[node name="Label" type="Label" parent="HBC/LastButton"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_top = 48.0
+offset_right = 48.0
+offset_bottom = 26.0
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "last"
+horizontal_alignment = 1
+
+[node name="Space4" type="TextureRect" parent="HBC/LastButton"]
+layout_mode = 2
+offset_left = 52.0
+offset_right = 76.0
+offset_bottom = 48.0
+texture = ExtResource("14_yxefo")
+
+[node name="Space5" type="TextureRect" parent="HBC"]
+layout_mode = 2
+texture = ExtResource("14_yxefo")
+
+[node name="RuleButton" type="TextureButton" parent="HBC"]
+layout_mode = 2
+texture_normal = ExtResource("19_0xbsf")
+
+[node name="Label" type="Label" parent="HBC/RuleButton"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_top = 48.0
+offset_right = 48.0
+offset_bottom = 26.0
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "rule"
+horizontal_alignment = 1
+
 [connection signal="pressed" from="InitButton" to="." method="_on_init_button_pressed"]
 [connection signal="toggled" from="StartStopButton" to="." method="_on_start_stop_button_toggled"]
 [connection signal="item_selected" from="BlackPlayer/OptionButton" to="." method="_on_black_player_selected"]
 [connection signal="item_selected" from="WhitePlayer/OptionButton" to="." method="_on_white_player_selected"]
-[connection signal="pressed" from="UndoButton" to="." method="_on_undo_button_pressed"]
+[connection signal="pressed" from="HBC/UndoButton" to="." method="_on_undo_button_pressed"]
