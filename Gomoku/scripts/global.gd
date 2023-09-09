@@ -185,9 +185,44 @@ class Board:
 			d_black[t[0]] &= ~t[1]
 			d_white[t[0]] &= ~t[1]
 		eval_putxy(x, y, EMPTY)
+	const is34table = [		# 三四テーブル
+		false,		# ・・・・・
+		false,		# ・・・・●
+		false,		# ・・・●・
+		false,		# ・・・●●
+		false,		# ・・●・・
+		false,		# ・・●・●
+		false,		# ・・●●・
+		true,		# ・・●●●
+		false,		# ・●・・・
+		false,		# ・●・・●
+		false,		# ・●・●・
+		true,		# ・●・●●
+		false,		# ・●●・・
+		true,		# ・●●・●
+		true,		# ・●●●・
+		true,		# ・●●●●
+		false,		# ●・・・・
+		false,		# ●・・・●
+		false,		# ●・・●・
+		false,		# ●・・●●
+		false,		# ●・●・・
+		false,		# ●・●・●
+		true,		# ●・●●・
+		true,		# ●・●●●
+		false,		# ●●・・・
+		false,		# ●●・・●
+		true,		# ●●・●・
+		true,		# ●●・●●
+		true,		# ●●●・・
+		true,		# ●●●・●
+		true,		# ●●●●・
+		false,		# ●●●●●
+	]
 	func is_forced(b5):
-		return (b5 == 0b01110 || b5 == 0b01111 || b5 == 0b10111 ||
-				b5 == 0b11011 || b5 == 0b11101 || b5 == 0b11110)
+		return is34table[b5]
+		#return (b5 == 0b01110 || b5 == 0b01111 || b5 == 0b10111 ||
+		#		b5 == 0b11011 || b5 == 0b11101 || b5 == 0b11110)
 	func eval_bitmap(black, white, nbit, nxcol):		# bitmap（下位 nbit）を評価
 		var ev = 0
 		for i in range(nbit - 4):
