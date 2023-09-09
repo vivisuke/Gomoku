@@ -189,9 +189,13 @@ func _on_start_stop_button_toggled(button_pressed):
 		print_next_turn()
 		$StartStopButton.text = "Stop Game"
 		$StartStopButton.icon = $StartStopButton/StopTexture.texture
+		$BlackPlayer/OptionButton.disabled = true
+		$WhitePlayer/OptionButton.disabled = true
 	else:
 		$StartStopButton.text = "Start Game"
 		$StartStopButton.icon = $StartStopButton/PlayTexture.texture
+		$BlackPlayer/OptionButton.disabled = false
+		$WhitePlayer/OptionButton.disabled = false
 	update_next_underline()
 
 
