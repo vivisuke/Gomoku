@@ -41,11 +41,14 @@ func _ready():
 	pass # Replace with function body.
 
 func update_view():
-	update_next_underline()
 	for y in range(N_VERT):
 		for x in range(N_HORZ):
 			var c:int = bd.get_color(x, y)
 			$Board/TileMap.set_cell(0, Vector2(x, y), c-1, Vector2i(0, 0))
+	if bd.n_space == 0:
+		on_gameover()
+		return
+	update_next_underline()
 	if prev_put_pos.x >= 0:
 		$Board/BGTileMap.set_cell(0, prev_put_pos, -1, Vector2i(0, 0))
 	if put_pos.x >= 0:
@@ -120,6 +123,8 @@ func on_gameover():
 	#var c = "BLACK" if next_color == g.WHITE else "WHITE"
 	#$MessLabel.text = c + " won."
 	won_color = g.BLACK if next_color == g.WHITE else g.WHITE
+	$BlackPlayer/OptionButton.disabled = false
+	$WhitePlayer/OptionButton.disabled = false
 func unit_test():
 	var b2 = g.Board.new()
 	b2.put_color(0, 0, g.BLACK)

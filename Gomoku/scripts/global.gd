@@ -46,7 +46,8 @@ class Board:
 		100,	# ●●●●・
 		9999,	# ●●●●●
 	]
-	var nput
+	#var nput
+	var n_space				# 空欄数
 	var eval = 0			# 評価値
 	var h_black = []		# 水平方向ビットマップ
 	var h_white = []		# 水平方向ビットマップ
@@ -77,7 +78,8 @@ class Board:
 		#
 		unit_test()
 	func clear():
-		nput = 0
+		#nput = 0
+		n_space = N_HORZ * N_VERT
 		eval = 0
 		h_black.fill(0)
 		h_white.fill(0)
@@ -142,7 +144,8 @@ class Board:
 		return EMPTY
 	# 着手・盤面評価
 	func put_color(x, y, col):		# 前提：(x, y) は空欄、col：BLACK or WHITE
-		nput += 1
+		#nput += 1
+		n_space -= 1
 		var mask = 1 << (N_HORZ - 1 - x)
 		if col == BLACK:
 			h_black[y] |= mask
@@ -168,7 +171,8 @@ class Board:
 				d_white[t[0]] |= t[1]
 		eval_putxy(x, y, BLACK+WHITE-col)	# 結果は eval に格納される
 	func remove_color(x, y):
-		nput -= 1
+		#nput -= 1
+		n_space += 1
 		var mask = 1 << (N_HORZ - 1 - x)
 		h_black[y] &= ~mask
 		h_white[y] &= ~mask
