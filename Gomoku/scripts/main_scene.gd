@@ -101,7 +101,7 @@ func _input(event):
 			if !bd.is_empty(pos.x, pos.y): return
 			#print(pos)
 			do_put(pos.x, pos.y)
-			bd.print_eval_ndiff(next_color)
+			#bd.print_eval_ndiff(next_color)
 	pass
 func do_put(x, y):
 	bd.put_color(x, y, next_color)
@@ -241,4 +241,9 @@ func _on_black_player_selected(index):
 
 func _on_white_player_selected(index):
 	white_player = index
+	pass # Replace with function body.
+
+
+func _on_rule_button_pressed():
+	bd.print_eval_ndiff(next_color)
 	pass # Replace with function body.

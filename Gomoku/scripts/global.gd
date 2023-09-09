@@ -350,13 +350,14 @@ class Board:
 				for x in range(N_HORZ):
 					if is_empty(x, y):
 						put_color(x, y, next_color)
-						calc_eval(WHITE)
-						if eval > mx:
-							mx = eval
-							#op = Vector2i(x, y)
-							lst = [Vector2i(x, y)]
-						elif eval == mx:
-							lst.push_back(Vector2i(x, y))
+						if !is_six(x, y, next_color):
+							calc_eval(WHITE)
+							if eval > mx:
+								mx = eval
+								#op = Vector2i(x, y)
+								lst = [Vector2i(x, y)]
+							elif eval == mx:
+								lst.push_back(Vector2i(x, y))
 						remove_color(x, y)
 		else:						# 白番
 			var mn = 99999
@@ -403,12 +404,15 @@ class Board:
 			var txt = ""
 			var mask = 1 << 10
 			for x in range(N_HORZ):
-				if (h_black[y] & mask) != 0: txt += "   X"
-				elif (h_white[y] & mask) != 0: txt += "   O"
+				if (h_black[y] & mask) != 0: txt += "    X"
+				elif (h_white[y] & mask) != 0: txt += "    O"
 				else:
 					put_color(x, y, next_color)
-					calc_eval(next_color)
-					txt += ("%4d" % eval)
+					if next_color == BLACK && is_six(x, y, BLACK):
+						txt += "  ---"
+					else:
+						calc_eval(next_color)
+						txt += ("%5d" % eval)
 					remove_color(x, y)
 				mask >>= 1
 			print(txt)
