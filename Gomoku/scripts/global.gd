@@ -232,14 +232,14 @@ class Board:
 				if w5 == 0:
 					ev += evtable[b5]
 					if nxcol == BLACK && is_forced(b5):
-						ev += evtable[b5]
+						ev += evtable[b5] * 2
 				else:
 					pass	# 黒白両方ある場合は、評価値: 0
 			else:
 				if w5 != 0:
 					ev -= evtable[w5]
 					if nxcol == WHITE && is_forced(w5):
-						ev -= evtable[w5]
+						ev -= evtable[w5] * 2
 				else:
 					pass	# 黒白両方空欄のみの場合は、評価値: 0
 			black >>= 1
@@ -319,7 +319,8 @@ class Board:
 			if u[0] >= 0 && is_five_sub(u_white[u[0]]): return true
 		return false
 	func put_minmax(next_color):
-		var op = Vector2i(-1, -1)
+		#var op = Vector2i(-1, -1)
+		var lst = []
 		if next_color == BLACK:		# 黒番
 			var mx = -99999
 			for y in range(N_VERT):
@@ -329,7 +330,10 @@ class Board:
 						calc_eval(WHITE)
 						if eval > mx:
 							mx = eval
-							op = Vector2i(x, y)
+							#op = Vector2i(x, y)
+							lst = [Vector2i(x, y)]
+						elif eval == mx:
+							lst.push_back(Vector2i(x, y))
 						remove_color(x, y)
 		else:						# 白番
 			var mn = 99999
@@ -340,9 +344,14 @@ class Board:
 						calc_eval(BLACK)
 						if eval < mn:
 							mn = eval
-							op = Vector2i(x, y)
+							#op = Vector2i(x, y)
+							lst = [Vector2i(x, y)]
+						elif eval == mn:
+							lst.push_back(Vector2i(x, y))
 						remove_color(x, y)
-		return op
+		if lst.size() == 1: return lst[0]
+		var r = randi() % lst.size()
+		return lst[r]
 	func print():
 		for y in range(N_VERT):
 			var txt = ""
