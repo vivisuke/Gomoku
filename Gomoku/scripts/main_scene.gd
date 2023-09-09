@@ -105,11 +105,16 @@ func _input(event):
 	pass
 func do_put(x, y):
 	bd.put_color(x, y, next_color)
+	var sx = bd.is_six(x, y, next_color)
+	print("is_six = ", sx)
+	if next_color == g.BLACK && sx:
+		# undone: beep ?
+		bd.remove_color(x, y)
+		$MessLabel.text = "overlines are prohibited"
+		return
 	var pos = Vector2i(x, y)
 	move_hist.push_back(pos)
 	$HBC/UndoButton.disabled = false
-	var sx = bd.is_six(x, y, next_color)
-	print("is_six = ", sx)
 	var fv = bd.is_five(x, y, next_color)
 	print("is_five = ", fv)
 	prev_put_pos = put_pos
