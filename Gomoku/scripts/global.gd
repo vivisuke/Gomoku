@@ -318,7 +318,7 @@ class Board:
 			if d[0] >= 0 && is_five_sub(d_white[d[0]]): return true
 			if u[0] >= 0 && is_five_sub(u_white[u[0]]): return true
 		return false
-	func minmax(next_color):
+	func put_minmax(next_color):
 		var op = Vector2i(-1, -1)
 		if next_color == BLACK:		# 黒番
 			var mx = -99999

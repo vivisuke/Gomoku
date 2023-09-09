@@ -72,7 +72,7 @@ func _process(delta):
 			next_color == g.BLACK && black_player >= AI_RANDOM) ):
 		# AI の手番
 		AI_thinking = true
-		var op = bd.minmax(next_color)
+		var op = bd.put_minmax(next_color)
 		do_put(op.x, op.y)
 		AI_thinking = false
 	pass
