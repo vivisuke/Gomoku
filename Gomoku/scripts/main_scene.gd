@@ -4,6 +4,7 @@ enum {
 	HUMAN = 0, AI_RANDOM, AI_DEPTH_1, AI_DEPTH_2, AI_DEPTH_3, 
 }
 const BGID = 2
+const CELL_WD = 42
 
 var N_HORZ = g.N_HORZ
 var N_VERT = g.N_VERT
@@ -24,8 +25,8 @@ var next_color = g.BLACK		# 次の手番
 var white_player = HUMAN
 var black_player = HUMAN
 var pressedPos = Vector2i(0, 0)
-var put_pos = Vector2i(-1, -1)
-var prev_put_pos = Vector2(-1, -1)
+var put_pos = Vector2i(-10, -10)	# -10 for 画面外
+#var prev_put_pos = Vector2(-1, -1)
 var move_hist = []				# 着手履歴
 var move_ix = -1				# 着手済みIX
 
@@ -52,11 +53,16 @@ func update_view():
 		on_gameover(g.EMPTY)
 		return
 	update_next_underline()
-	if prev_put_pos.x >= 0:
-		$Board/BGTileMap.set_cell(0, prev_put_pos, -1, Vector2i(0, 0))
+	# prev_put_pos の強調を消し、put_pos を強調
+	#if prev_put_pos.x >= 0:
+	#	#$Board/BGTileMap.set_cell(0, prev_put_pos, -1, Vector2i(0, 0))
 	if put_pos.x >= 0:
-		$Board/BGTileMap.set_cell(0, put_pos, BGID, Vector2i(0, 0))
+		#$Board/BGTileMap.set_cell(0, put_pos, BGID, Vector2i(0, 0))
+		$Board/PutCursor.position = put_pos*CELL_WD
 		print("put_pos = ", put_pos)
+	else:
+		$Board/PutCursor.position = Vector2(-10, -10)*CELL_WD
+	#
 	if won_color != g.EMPTY:
 		$MessLabel.text = ("BLACK" if won_color == g.BLACK else "WHITE") + " won"
 	elif bd.n_space == 0:
@@ -121,7 +127,7 @@ func do_put(x, y):
 	$HBC/UndoButton.disabled = false
 	var fv = bd.is_five(x, y, next_color)
 	print("is_five = ", fv)
-	prev_put_pos = put_pos
+	#prev_put_pos = put_pos
 	put_pos = pos
 	if fv: on_gameover(next_color)
 	next_color = (g.BLACK + g.WHITE) - next_color
@@ -198,9 +204,10 @@ func _on_init_button_pressed():
 	move_hist.clear()
 	move_ix = -1
 	$HBC/UndoButton.disabled = true
-	if put_pos != Vector2i(-1, -1):
-		$Board/BGTileMap.set_cell(0, put_pos, -1, Vector2i(0, 0))
-		put_pos = Vector2i(-1, -1)
+	put_pos = Vector2i(-10, -10)
+	#if put_pos != Vector2i(-1, -1):
+	#	#$Board/BGTileMap.set_cell(0, put_pos, -1, Vector2i(0, 0))
+	#	put_pos = Vector2i(-10, -10)
 	update_view()
 func _on_start_stop_button_toggled(button_pressed):
 	game_started = button_pressed
@@ -221,7 +228,7 @@ func _on_start_stop_button_toggled(button_pressed):
 
 func _on_undo_button_pressed():
 	if move_hist.size() < 2: return
-	$Board/BGTileMap.set_cell(0, put_pos, -1, Vector2i(0, 0))
+	#$Board/BGTileMap.set_cell(0, put_pos, -1, Vector2i(0, 0))
 	var p = move_hist.pop_back()
 	bd.remove_color(p.x, p.y)
 	#bd.eval_putxy(p.x, p.y)
@@ -232,9 +239,9 @@ func _on_undo_button_pressed():
 	$HBC/UndoButton.disabled = move_hist.is_empty()
 	if !move_hist.is_empty():
 		put_pos = move_hist.back()
-		$Board/BGTileMap.set_cell(0, put_pos, BGID, Vector2i(0, 0))	# 直前着手強調
+		#$Board/BGTileMap.set_cell(0, put_pos, BGID, Vector2i(0, 0))	# 直前着手強調
 	else:
-		put_pos = Vector2i(-1, -1)
+		put_pos = Vector2i(-10, -10)
 
 	update_view()
 	pass # Replace with function body.
@@ -260,24 +267,25 @@ func _on_back_button_pressed():
 		var p = move_hist[move_ix]
 		move_ix -= 1
 		bd.remove_color(p.x, p.y)
-		$Board/BGTileMap.set_cell(0, p, -1, Vector2i(0, 0))
-		prev_put_pos = Vector2i(-1, -1)
+		#prev_put_pos = p
+		#$Board/BGTileMap.set_cell(0, p, -1, Vector2i(0, 0))
+		#prev_put_pos = Vector2i(-1, -1)
 		if move_ix >= 0:
 			put_pos = move_hist[move_ix]
 			#var prev = move_hist[move_ix]
 			#$Board/BGTileMap.set_cell(0, prev, BGID, Vector2i(0, 0))
 		else:
-			put_pos = Vector2i(-1, -1)
+			put_pos = Vector2i(-10, -10)
 		update_view()
 func _on_forward_button_pressed():
 	if move_ix + 1 < move_hist.size():
-		if move_ix >= 0:
-			var prev = move_hist[move_ix]
-			$Board/BGTileMap.set_cell(0, prev, -1, Vector2i(0, 0))
+		#if move_ix >= 0:
+		#	var prev = move_hist[move_ix]
+		#	#$Board/BGTileMap.set_cell(0, prev, -1, Vector2i(0, 0))
 		move_ix += 1
-		var p = move_hist[move_ix]
-		bd.put_color(p.x, p.y, next_color)
-		$Board/BGTileMap.set_cell(0, p, BGID, Vector2i(0, 0))
+		put_pos = move_hist[move_ix]
+		bd.put_color(put_pos.x, put_pos.y, next_color)
+		#$Board/BGTileMap.set_cell(0, p, BGID, Vector2i(0, 0))
 		next_color = (g.BLACK + g.WHITE) - next_color
 		update_view()
 	pass # Replace with function body.
