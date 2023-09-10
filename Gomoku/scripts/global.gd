@@ -228,6 +228,7 @@ class Board:
 		#return (b5 == 0b01110 || b5 == 0b01111 || b5 == 0b10111 ||
 		#		b5 == 0b11011 || b5 == 0b11101 || b5 == 0b11110)
 	func eval_bitmap(black, white, nbit, nxcol):		# bitmap（下位 nbit）を評価
+		if black == 0 && white == 0: return 0
 		var ev = 0
 		for i in range(nbit - 4):
 			var b5 = black & 0x1f

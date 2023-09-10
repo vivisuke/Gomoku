@@ -254,8 +254,18 @@ func _on_rule_button_pressed():
 
 
 func _on_back_button_pressed():
-	pass # Replace with function body.
+	if move_ix >= 0:
+		var p = move_hist[move_ix]
+		move_ix -= 1
+		bd.remove_color(p.x, p.y)
+		update_view()
 func _on_forward_button_pressed():
+	if move_ix + 1 < move_hist.size():
+		move_ix += 1
+		var p = move_hist[move_ix]
+		bd.put_color(p.x, p.y, next_color)
+		next_color = (g.BLACK + g.WHITE) - next_color
+		update_view()
 	pass # Replace with function body.
 func _on_first_button_pressed():
 	pass # Replace with function body.
