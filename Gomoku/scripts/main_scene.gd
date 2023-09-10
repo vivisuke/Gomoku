@@ -71,6 +71,8 @@ func update_view():
 		$MessLabel.text = "push [Start Game]"
 	else:
 		print_next_turn()
+	$HBC/BackButton.disabled = move_ix < 0 || game_started
+	$HBC/ForwardButton.disabled = move_hist.size() - 1 <= move_ix || game_started
 	pass
 func print_next_turn():
 	if next_color == g.BLACK:
@@ -223,7 +225,8 @@ func _on_start_stop_button_toggled(button_pressed):
 		$StartStopButton.icon = $StartStopButton/PlayTexture.texture
 		$BlackPlayer/OptionButton.disabled = false
 		$WhitePlayer/OptionButton.disabled = false
-	update_next_underline()
+	update_view()
+	#update_next_underline()
 
 
 func _on_undo_button_pressed():

@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://ditiwje3j3fsh"]
+[gd_scene load_steps=29 format=3 uid="uid://ditiwje3j3fsh"]
 
 [ext_resource type="Script" path="res://scripts/TitleBar.gd" id="1_3jkov"]
 [ext_resource type="Script" path="res://scripts/Board.gd" id="1_bcx5t"]
@@ -16,9 +16,13 @@
 [ext_resource type="Texture2D" uid="uid://bkd5kj0qv03wg" path="res://images/empty24.png" id="14_yxefo"]
 [ext_resource type="Texture2D" uid="uid://b4bxgbdht6gxe" path="res://images/skip_previous_black.png" id="15_bad0q"]
 [ext_resource type="Texture2D" uid="uid://dofaqkeomdoj7" path="res://images/back_arrow_black.png" id="16_s3adq"]
+[ext_resource type="Texture2D" uid="uid://7a0madsbs3lm" path="res://images/back_arrow_white.png" id="17_865t1"]
 [ext_resource type="Texture2D" uid="uid://cxyoe78etfhmu" path="res://images/play_arrow_black.png" id="17_xg3s2"]
 [ext_resource type="Texture2D" uid="uid://bwiko8uoxvi10" path="res://images/skip_next_black.png" id="18_lm25u"]
+[ext_resource type="Texture2D" uid="uid://b3qdf6ig1v2k" path="res://images/back_arrow_gray.png" id="18_vbktr"]
 [ext_resource type="Texture2D" uid="uid://cr7rul86x0yb0" path="res://images/rule_black.png" id="19_0xbsf"]
+[ext_resource type="Texture2D" uid="uid://b8rl8tpeocr7a" path="res://images/play_arrow_white.png" id="20_rdm5j"]
+[ext_resource type="Texture2D" uid="uid://bku51cmur5866" path="res://images/play_arrow_gray.png" id="21_buxqc"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wnvxq"]
 texture = ExtResource("10_tqbab")
@@ -278,6 +282,8 @@ texture = ExtResource("14_yxefo")
 [node name="BackButton" type="TextureButton" parent="HBC"]
 layout_mode = 2
 texture_normal = ExtResource("16_s3adq")
+texture_pressed = ExtResource("17_865t1")
+texture_disabled = ExtResource("18_vbktr")
 
 [node name="Label" type="Label" parent="HBC/BackButton"]
 layout_mode = 1
@@ -298,6 +304,8 @@ texture = ExtResource("14_yxefo")
 [node name="ForwardButton" type="TextureButton" parent="HBC"]
 layout_mode = 2
 texture_normal = ExtResource("17_xg3s2")
+texture_pressed = ExtResource("20_rdm5j")
+texture_disabled = ExtResource("21_buxqc")
 
 [node name="Label" type="Label" parent="HBC/ForwardButton"]
 layout_mode = 1
