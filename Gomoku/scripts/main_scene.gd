@@ -3,6 +3,8 @@ extends Node2D
 enum {
 	HUMAN = 0, AI_RANDOM, AI_DEPTH_1, AI_DEPTH_2, AI_DEPTH_3, 
 }
+const BGID = 2
+
 var N_HORZ = g.N_HORZ
 var N_VERT = g.N_VERT
 var N_CELLS = N_HORZ*N_VERT
@@ -53,7 +55,7 @@ func update_view():
 	if prev_put_pos.x >= 0:
 		$Board/BGTileMap.set_cell(0, prev_put_pos, -1, Vector2i(0, 0))
 	if put_pos.x >= 0:
-		$Board/BGTileMap.set_cell(0, put_pos, 2, Vector2i(0, 0))
+		$Board/BGTileMap.set_cell(0, put_pos, BGID, Vector2i(0, 0))
 		print("put_pos = ", put_pos)
 	if won_color != g.EMPTY:
 		$MessLabel.text = ("BLACK" if won_color == g.BLACK else "WHITE") + " won"
@@ -230,7 +232,7 @@ func _on_undo_button_pressed():
 	$HBC/UndoButton.disabled = move_hist.is_empty()
 	if !move_hist.is_empty():
 		put_pos = move_hist.back()
-		$Board/BGTileMap.set_cell(0, put_pos, 2, Vector2i(0, 0))	# 直前着手強調
+		$Board/BGTileMap.set_cell(0, put_pos, BGID, Vector2i(0, 0))	# 直前着手強調
 	else:
 		put_pos = Vector2i(-1, -1)
 
@@ -258,12 +260,24 @@ func _on_back_button_pressed():
 		var p = move_hist[move_ix]
 		move_ix -= 1
 		bd.remove_color(p.x, p.y)
+		$Board/BGTileMap.set_cell(0, p, -1, Vector2i(0, 0))
+		prev_put_pos = Vector2i(-1, -1)
+		if move_ix >= 0:
+			put_pos = move_hist[move_ix]
+			#var prev = move_hist[move_ix]
+			#$Board/BGTileMap.set_cell(0, prev, BGID, Vector2i(0, 0))
+		else:
+			put_pos = Vector2i(-1, -1)
 		update_view()
 func _on_forward_button_pressed():
 	if move_ix + 1 < move_hist.size():
+		if move_ix >= 0:
+			var prev = move_hist[move_ix]
+			$Board/BGTileMap.set_cell(0, prev, -1, Vector2i(0, 0))
 		move_ix += 1
 		var p = move_hist[move_ix]
 		bd.put_color(p.x, p.y, next_color)
+		$Board/BGTileMap.set_cell(0, p, BGID, Vector2i(0, 0))
 		next_color = (g.BLACK + g.WHITE) - next_color
 		update_view()
 	pass # Replace with function body.
