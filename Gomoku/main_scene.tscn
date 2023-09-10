@@ -76,7 +76,7 @@ offset_right = 413.0
 offset_bottom = 47.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 20
-text = "ver 0.001"
+text = "ver 0.002"
 
 [node name="InitButton" type="Button" parent="."]
 offset_left = 10.0
@@ -357,4 +357,8 @@ horizontal_alignment = 1
 [connection signal="item_selected" from="BlackPlayer/OptionButton" to="." method="_on_black_player_selected"]
 [connection signal="item_selected" from="WhitePlayer/OptionButton" to="." method="_on_white_player_selected"]
 [connection signal="pressed" from="HBC/UndoButton" to="." method="_on_undo_button_pressed"]
+[connection signal="pressed" from="HBC/FirstButton" to="." method="_on_first_button_pressed"]
+[connection signal="pressed" from="HBC/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="pressed" from="HBC/ForwardButton" to="." method="_on_forward_button_pressed"]
+[connection signal="pressed" from="HBC/LastButton" to="." method="_on_last_button_pressed"]
 [connection signal="pressed" from="HBC/RuleButton" to="." method="_on_rule_button_pressed"]

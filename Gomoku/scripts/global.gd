@@ -223,8 +223,8 @@ class Board:
 		true,		# ●●●●・
 		false,		# ●●●●●
 	]
-	func is_forced(b5):
-		return is34table[b5]
+	func is_forced(b5, w5):
+		return is34table[b5] && w5 == 0
 		#return (b5 == 0b01110 || b5 == 0b01111 || b5 == 0b10111 ||
 		#		b5 == 0b11011 || b5 == 0b11101 || b5 == 0b11110)
 	func eval_bitmap(black, white, nbit, nxcol):		# bitmap（下位 nbit）を評価
@@ -235,14 +235,14 @@ class Board:
 			if b5 != 0:
 				if w5 == 0:
 					ev += evtable[b5]
-					if nxcol == BLACK && is_forced(b5):
+					if nxcol == BLACK && is_forced(b5, w5):
 						ev += evtable[b5] * 2
 				else:
 					pass	# 黒白両方ある場合は、評価値: 0
 			else:
 				if w5 != 0:
 					ev -= evtable[w5]
-					if nxcol == WHITE && is_forced(w5):
+					if nxcol == WHITE && is_forced(w5, b5):
 						ev -= evtable[w5] * 2
 				else:
 					pass	# 黒白両方空欄のみの場合は、評価値: 0

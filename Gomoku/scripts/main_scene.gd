@@ -25,6 +25,7 @@ var pressedPos = Vector2i(0, 0)
 var put_pos = Vector2i(-1, -1)
 var prev_put_pos = Vector2(-1, -1)
 var move_hist = []				# 着手履歴
+var move_ix = -1				# 着手済みIX
 
 func _ready():
 	#rng.randomize()		# Setups a time-based seed
@@ -113,6 +114,7 @@ func do_put(x, y):
 		$MessLabel.text = "overlines are prohibited"
 		return
 	var pos = Vector2i(x, y)
+	move_ix = move_hist.size()
 	move_hist.push_back(pos)
 	$HBC/UndoButton.disabled = false
 	var fv = bd.is_five(x, y, next_color)
@@ -192,6 +194,7 @@ func _on_init_button_pressed():
 	next_color = g.BLACK
 	won_color = g.EMPTY
 	move_hist.clear()
+	move_ix = -1
 	$HBC/UndoButton.disabled = true
 	if put_pos != Vector2i(-1, -1):
 		$Board/BGTileMap.set_cell(0, put_pos, -1, Vector2i(0, 0))
@@ -222,11 +225,12 @@ func _on_undo_button_pressed():
 	#bd.eval_putxy(p.x, p.y)
 	p = move_hist.pop_back()
 	bd.remove_color(p.x, p.y)
+	move_ix -= 2
 	#bd.eval_putxy(p.x, p.y)
 	$HBC/UndoButton.disabled = move_hist.is_empty()
 	if !move_hist.is_empty():
 		put_pos = move_hist.back()
-		$Board/BGTileMap.set_cell(0, put_pos, 2, Vector2i(0, 0))
+		$Board/BGTileMap.set_cell(0, put_pos, 2, Vector2i(0, 0))	# 直前着手強調
 	else:
 		put_pos = Vector2i(-1, -1)
 
@@ -246,4 +250,14 @@ func _on_white_player_selected(index):
 
 func _on_rule_button_pressed():
 	bd.print_eval_ndiff(next_color)
+	pass # Replace with function body.
+
+
+func _on_back_button_pressed():
+	pass # Replace with function body.
+func _on_forward_button_pressed():
+	pass # Replace with function body.
+func _on_first_button_pressed():
+	pass # Replace with function body.
+func _on_last_button_pressed():
 	pass # Replace with function body.
