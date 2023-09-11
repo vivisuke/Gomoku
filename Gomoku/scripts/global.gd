@@ -2,6 +2,7 @@ extends Node2D
 
 enum {
 	EMPTY = 0, BLACK, WHITE,
+	NONE = 0, ONE, TWO, THREE, FOUR, FIVE, SIX
 }
 const N_HORZ = 11
 const N_VERT = 11
@@ -61,6 +62,8 @@ class Board:
 	var v_eval = []			# 垂直方向評価値
 	var u_eval = []			# 右上方向評価値
 	var d_eval = []			# 右下方向評価値
+	var move_hist = []				# 着手履歴
+	var move_ix = -1				# 着手済みIX
 	func _init():
 		h_black.resize(N_VERT)
 		h_white.resize(N_VERT)
@@ -190,41 +193,41 @@ class Board:
 			d_white[t[0]] &= ~t[1]
 		eval_putxy(x, y, EMPTY)
 	const is34table = [		# 三四テーブル
-		false,		# ・・・・・
-		false,		# ・・・・●
-		false,		# ・・・●・
-		false,		# ・・・●●
-		false,		# ・・●・・
-		false,		# ・・●・●
-		false,		# ・・●●・
-		true,		# ・・●●●
-		false,		# ・●・・・
-		false,		# ・●・・●
-		false,		# ・●・●・
-		true,		# ・●・●●
-		false,		# ・●●・・
-		true,		# ・●●・●
-		true,		# ・●●●・
-		true,		# ・●●●●
-		false,		# ●・・・・
-		false,		# ●・・・●
-		false,		# ●・・●・
-		false,		# ●・・●●
-		false,		# ●・●・・
-		false,		# ●・●・●
-		true,		# ●・●●・
-		true,		# ●・●●●
-		false,		# ●●・・・
-		false,		# ●●・・●
-		true,		# ●●・●・
-		true,		# ●●・●●
-		true,		# ●●●・・
-		true,		# ●●●・●
-		true,		# ●●●●・
-		false,		# ●●●●●
+		NONE,		# ・・・・・
+		NONE,		# ・・・・●
+		NONE,		# ・・・●・
+		NONE,		# ・・・●●
+		NONE,		# ・・●・・
+		NONE,		# ・・●・●
+		NONE,		# ・・●●・
+		THREE,		# ・・●●●
+		NONE,		# ・●・・・
+		NONE,		# ・●・・●
+		NONE,		# ・●・●・
+		THREE,		# ・●・●●
+		NONE,		# ・●●・・
+		THREE,		# ・●●・●
+		THREE,		# ・●●●・
+		FOUR,		# ・●●●●
+		NONE,		# ●・・・・
+		NONE,		# ●・・・●
+		NONE,		# ●・・●・
+		NONE,		# ●・・●●
+		NONE,		# ●・●・・
+		NONE,		# ●・●・●
+		THREE,		# ●・●●・
+		FOUR,		# ●・●●●
+		NONE,		# ●●・・・
+		NONE,		# ●●・・●
+		THREE,		# ●●・●・
+		FOUR,		# ●●・●●
+		THREE,		# ●●●・・
+		FOUR,		# ●●●・●
+		FOUR,		# ●●●●・
+		FIVE,		# ●●●●●
 	]
 	func is_forced(b5, w5):
-		return is34table[b5] && w5 == 0
+		return is34table[b5] != NONE && w5 == 0
 		#return (b5 == 0b01110 || b5 == 0b01111 || b5 == 0b10111 ||
 		#		b5 == 0b11011 || b5 == 0b11101 || b5 == 0b11110)
 	func eval_bitmap(black, white, nbit, nxcol):		# bitmap（下位 nbit）を評価
@@ -341,6 +344,37 @@ class Board:
 			if is_six_sub(v_white[x]): return true
 			if d[0] >= 0 && is_six_sub(d_white[d[0]]): return true
 			if u[0] >= 0 && is_six_sub(u_white[u[0]]): return true
+		return false
+	#func is_four_sub(b: int, bitmap: int):		# 黒が b に着手後、四目並んだか？
+		#var a = bitmap & (bitmap>>1) & (bitmap>>2) & (bitmap>>3)
+		#return a != 0
+	func is_four_sub(p: int, black:int, white: int):		# p に着手後、四目並んだか？
+		while p > 0b10000:		# 着手箇所の影響範囲外を削除
+			black >>= 1
+			white >>= 1
+			p >>= 1
+		while p != 0:
+			if (white & 0b11111) == 0:
+				if is34table[black & 0b11111] >= FOUR: return true
+			black >>= 1
+			white >>= 1
+			p >>= 1
+		return false
+	func is_four(x, y, col):		# (x, y) に着手後、活四ができたか？
+		var h = 1 << (N_HORZ - 1 - x)
+		var v = 1 << (N_HORZ - 1 - y)
+		var d = xyToDrIxMask(x, y)
+		var u = xyToUrIxMask(x, y)
+		if col == BLACK:
+			if is_four_sub(1<<(10-x), h_black[y], h_white[y]): return true
+			if is_four_sub(1<<(10-y), v_black[x], v_white[x]): return true
+			if d[0] >= 0 && is_four_sub(d[1], d_black[d[0]], d_white[d[0]]): return true
+			if u[0] >= 0 && is_four_sub(u[1], u_black[u[0]], u_white[u[0]]): return true
+		elif col == WHITE:
+			if is_four_sub(1<<(10-x), h_white[y], h_black[y]): return true
+			if is_four_sub(1<<(10-y), v_white[x], v_black[x]): return true
+			if d[0] >= 0 && is_four_sub(d[1], d_white[d[0]], d_black[d[0]]): return true
+			if u[0] >= 0 && is_four_sub(u[1], u_white[u[0]], u_black[u[0]]): return true
 		return false
 	func put_minmax(next_color):
 		#var op = Vector2i(-1, -1)

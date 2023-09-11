@@ -151,6 +151,7 @@ func on_gameover(wcol):
 	$WhitePlayer/OptionButton.disabled = false
 func unit_test():
 	var b2 = g.Board.new()
+	# テスト：is_five()
 	b2.put_color(0, 0, g.BLACK)
 	b2.put_color(1, 0, g.BLACK)
 	b2.put_color(2, 0, g.BLACK)
@@ -175,6 +176,74 @@ func unit_test():
 	b2.put_color(6, 4, g.BLACK)
 	print("u_black[5] = %03x" % b2.u_black[5])
 	assert(b2.is_five(6, 4, g.BLACK))
+	# テスト：is_six(x, y, col) 
+	b2.clear()
+	b2.put_color(0, 0, g.BLACK)
+	b2.put_color(1, 0, g.BLACK)
+	b2.put_color(2, 0, g.BLACK)
+	b2.put_color(3, 0, g.BLACK)
+	b2.put_color(4, 0, g.BLACK)
+	b2.put_color(5, 0, g.BLACK)
+	assert( b2.is_six(3, 0, g.BLACK) )
+	b2.remove_color(2, 0)
+	b2.put_color(2, 0, g.WHITE)
+	assert( !b2.is_six(3, 0, g.BLACK) )
+	# テスト：is_four(x, y, col) 
+	b2.clear()
+	b2.put_color(0, 0, g.BLACK)
+	b2.put_color(1, 0, g.BLACK)
+	b2.put_color(2, 0, g.BLACK)
+	assert( !b2.is_four(2, 0, g.BLACK) )	# 三の場合
+	b2.put_color(3, 0, g.BLACK)
+	assert( b2.is_four(3, 0, g.BLACK) )		# （連続）四の場合
+	b2.put_color(4, 0, g.WHITE)
+	assert( !b2.is_four(4, 0, g.BLACK) )	# 四が止められているの場合
+	b2.remove_color(3, 0)
+	b2.remove_color(4, 0)
+	b2.put_color(4, 0, g.BLACK)
+	assert( b2.is_four(4, 0, g.BLACK) )		# 飛び四 の場合
+	b2.clear()
+	b2.put_color(0, 0, g.BLACK)
+	b2.put_color(1, 1, g.BLACK)
+	b2.put_color(2, 2, g.BLACK)
+	assert( !b2.is_four(2, 2, g.BLACK) )	# 三の場合
+	b2.put_color(3, 3, g.BLACK)
+	assert( b2.is_four(3, 3, g.BLACK) )		# （連続）四の場合
+	b2.remove_color(3, 3)
+	b2.put_color(4, 4, g.BLACK)
+	assert( b2.is_four(4, 4, g.BLACK) )		# 飛び四 の場合
+	b2.clear()
+	b2.put_color(0, 0, g.WHITE)
+	b2.put_color(1, 1, g.BLACK)
+	b2.put_color(2, 2, g.BLACK)
+	b2.put_color(3, 3, g.BLACK)
+	b2.put_color(4, 4, g.BLACK)
+	assert( b2.is_four(1, 1, g.BLACK) )		# （連続）四の場合
+	assert( b2.is_four(2, 2, g.BLACK) )		# （連続）四の場合
+	assert( b2.is_four(3, 3, g.BLACK) )		# （連続）四の場合
+	assert( b2.is_four(4, 4, g.BLACK) )		# （連続）四の場合
+	b2.put_color(1, 7, g.BLACK)				# ｜・●●●●｜
+	b2.put_color(2, 8, g.BLACK)
+	b2.put_color(3, 9, g.BLACK)
+	b2.put_color(4, 10, g.BLACK)
+	assert( b2.is_four(1, 7, g.BLACK) )		# （連続）四の場合
+	assert( b2.is_four(2, 8, g.BLACK) )		# （連続）四の場合
+	assert( b2.is_four(3, 9, g.BLACK) )		# （連続）四の場合
+	assert( b2.is_four(4, 10, g.BLACK) )		# （連続）四の場合
+	b2.put_color(0, 6, g.WHITE)					# ｜◯●●●●｜
+	assert( !b2.is_four(1, 7, g.BLACK) )		# 四が止められているの場合
+	assert( !b2.is_four(2, 8, g.BLACK) )		# 四が止められているの場合
+	assert( !b2.is_four(3, 9, g.BLACK) )		# 四が止められているの場合
+	assert( !b2.is_four(4, 10, g.BLACK) )		# 四が止められているの場合
+	b2.put_color(0, 5, g.WHITE)					# ｜◯●●●●・｜
+	b2.put_color(1, 6, g.BLACK)
+	b2.put_color(2, 7, g.BLACK)
+	b2.put_color(3, 8, g.BLACK)
+	b2.put_color(4, 9, g.BLACK)
+	assert( b2.is_four(1, 6, g.BLACK) )		# （連続）四の場合
+	assert( b2.is_four(2, 7, g.BLACK) )		# （連続）四の場合
+	assert( b2.is_four(3, 8, g.BLACK) )		# （連続）四の場合
+	assert( b2.is_four(4, 9, g.BLACK) )		# （連続）四の場合
 	#
 	b2.clear()
 	b2.calc_eval(g.BLACK)
@@ -198,6 +267,7 @@ func unit_test():
 	b2.put_color(4, 6, g.WHITE)
 	b2.print_eval_ndiff(g.BLACK)
 	print("eval = ", b2.eval)
+	#
 
 
 func _on_init_button_pressed():
