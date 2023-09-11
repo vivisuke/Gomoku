@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://ditiwje3j3fsh"]
+[gd_scene load_steps=33 format=3 uid="uid://ditiwje3j3fsh"]
 
 [ext_resource type="Script" path="res://scripts/TitleBar.gd" id="1_3jkov"]
 [ext_resource type="Script" path="res://scripts/Board.gd" id="1_bcx5t"]
@@ -15,14 +15,18 @@
 [ext_resource type="Texture2D" uid="uid://hl2kdbh54uj0" path="res://images/undo_gray.png" id="13_i33cc"]
 [ext_resource type="Texture2D" uid="uid://bkd5kj0qv03wg" path="res://images/empty24.png" id="14_yxefo"]
 [ext_resource type="Texture2D" uid="uid://b4bxgbdht6gxe" path="res://images/skip_previous_black.png" id="15_bad0q"]
+[ext_resource type="Texture2D" uid="uid://m2tq2vk2bpbf" path="res://images/skip_previous_white.png" id="16_cgegn"]
 [ext_resource type="Texture2D" uid="uid://dofaqkeomdoj7" path="res://images/back_arrow_black.png" id="16_s3adq"]
 [ext_resource type="Texture2D" uid="uid://7a0madsbs3lm" path="res://images/back_arrow_white.png" id="17_865t1"]
+[ext_resource type="Texture2D" uid="uid://btw4i1qgicrf4" path="res://images/skip_previous_gray.png" id="17_wuodv"]
 [ext_resource type="Texture2D" uid="uid://cxyoe78etfhmu" path="res://images/play_arrow_black.png" id="17_xg3s2"]
 [ext_resource type="Texture2D" uid="uid://bwiko8uoxvi10" path="res://images/skip_next_black.png" id="18_lm25u"]
 [ext_resource type="Texture2D" uid="uid://b3qdf6ig1v2k" path="res://images/back_arrow_gray.png" id="18_vbktr"]
 [ext_resource type="Texture2D" uid="uid://cr7rul86x0yb0" path="res://images/rule_black.png" id="19_0xbsf"]
 [ext_resource type="Texture2D" uid="uid://b8rl8tpeocr7a" path="res://images/play_arrow_white.png" id="20_rdm5j"]
 [ext_resource type="Texture2D" uid="uid://bku51cmur5866" path="res://images/play_arrow_gray.png" id="21_buxqc"]
+[ext_resource type="Texture2D" uid="uid://1blb4mf5fkkn" path="res://images/skip_next_white.png" id="25_1egmy"]
+[ext_resource type="Texture2D" uid="uid://b8dlsb0rboj4v" path="res://images/skip_next_gray.png" id="26_yi1hs"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wnvxq"]
 texture = ExtResource("10_tqbab")
@@ -262,6 +266,8 @@ texture = ExtResource("14_yxefo")
 [node name="FirstButton" type="TextureButton" parent="HBC"]
 layout_mode = 2
 texture_normal = ExtResource("15_bad0q")
+texture_pressed = ExtResource("16_cgegn")
+texture_disabled = ExtResource("17_wuodv")
 
 [node name="Label" type="Label" parent="HBC/FirstButton"]
 layout_mode = 1
@@ -326,6 +332,8 @@ texture = ExtResource("14_yxefo")
 [node name="LastButton" type="TextureButton" parent="HBC"]
 layout_mode = 2
 texture_normal = ExtResource("18_lm25u")
+texture_pressed = ExtResource("25_1egmy")
+texture_disabled = ExtResource("26_yi1hs")
 
 [node name="Label" type="Label" parent="HBC/LastButton"]
 layout_mode = 1

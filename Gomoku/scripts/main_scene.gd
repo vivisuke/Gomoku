@@ -71,8 +71,10 @@ func update_view():
 		$MessLabel.text = "push [Start Game]"
 	else:
 		print_next_turn()
+	$HBC/FirstButton.disabled = move_ix < 0 || game_started
 	$HBC/BackButton.disabled = move_ix < 0 || game_started
 	$HBC/ForwardButton.disabled = move_hist.size() - 1 <= move_ix || game_started
+	$HBC/LastButton.disabled = move_hist.size() - 1 <= move_ix || game_started
 	pass
 func print_next_turn():
 	if next_color == g.BLACK:
@@ -279,6 +281,7 @@ func _on_back_button_pressed():
 			#$Board/BGTileMap.set_cell(0, prev, BGID, Vector2i(0, 0))
 		else:
 			put_pos = Vector2i(-10, -10)
+		next_color = (g.BLACK + g.WHITE) - next_color
 		update_view()
 func _on_forward_button_pressed():
 	if move_ix + 1 < move_hist.size():
@@ -293,6 +296,17 @@ func _on_forward_button_pressed():
 		update_view()
 	pass # Replace with function body.
 func _on_first_button_pressed():
-	pass # Replace with function body.
+	while move_ix >= 0:
+		var p = move_hist[move_ix]
+		move_ix -= 1
+		bd.remove_color(p.x, p.y)
+	next_color = g.BLACK
+	put_pos = Vector2i(-10, -10)
+	update_view()
 func _on_last_button_pressed():
-	pass # Replace with function body.
+	while move_ix + 1 < move_hist.size():
+		move_ix += 1
+		put_pos = move_hist[move_ix]
+		bd.put_color(put_pos.x, put_pos.y, next_color)
+		next_color = (g.BLACK + g.WHITE) - next_color
+	update_view()
