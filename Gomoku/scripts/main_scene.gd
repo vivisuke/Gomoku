@@ -275,6 +275,40 @@ func unit_test():
 	b2.calc_eval(g.WHITE)
 	print(b2.eval)
 	assert(b2.eval == 3)
+	# 合法手チェック
+	b2.clear()
+	b2.put_color(1, 0, g.BLACK)
+	b2.put_color(2, 0, g.BLACK)
+	b2.put_color(3, 0, g.BLACK)
+	b2.put_color(4, 0, g.BLACK)
+	b2.put_color(5, 0, g.BLACK)
+	b2.put_color(6, 0, g.BLACK)				# ｜・●●●●●●・…｜
+	assert( !b2.is_legal_put(1, 0, g.BLACK) )
+	assert( !b2.is_legal_put(2, 0, g.BLACK) )
+	assert( !b2.is_legal_put(3, 0, g.BLACK) )
+	assert( !b2.is_legal_put(4, 0, g.BLACK) )
+	assert( !b2.is_legal_put(5, 0, g.BLACK) )
+	assert( !b2.is_legal_put(6, 0, g.BLACK) )
+	b2.clear()
+	b2.put_color(0, 4, g.WHITE)
+	b2.put_color(1, 4, g.BLACK)
+	b2.put_color(2, 4, g.BLACK)
+	b2.put_color(3, 4, g.BLACK)
+	b2.put_color(4, 3, g.BLACK)
+	b2.put_color(4, 5, g.BLACK)
+	b2.put_color(4, 4, g.BLACK)		
+	assert( b2.is_legal_put(4, 4, g.BLACK) )	# 四三
+	b2.put_color(4, 6, g.BLACK)
+	assert( !b2.is_legal_put(4, 4, g.BLACK) )	# 四四
+	b2.clear()
+	b2.put_color(3, 4, g.BLACK)
+	b2.put_color(5, 4, g.BLACK)
+	b2.put_color(4, 3, g.BLACK)
+	b2.put_color(4, 5, g.BLACK)
+	b2.put_color(4, 4, g.BLACK)		
+	assert( !b2.is_legal_put(4, 4, g.BLACK) )	# 三三
+	b2.put_color(2, 4, g.WHITE)
+	assert( b2.is_legal_put(4, 4, g.BLACK) )	# 横方向が 非活三
 	#
 	b2.clear()
 	assert(b2.eval == 0)
