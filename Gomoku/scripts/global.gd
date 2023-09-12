@@ -21,15 +21,15 @@ class Board:
 		1,		# ・・●・・
 		2,		# ・・●・●
 		4,		# ・・●●・
-		10,		# ・・●●●
+		15,		# ・・●●●
 		1,		# ・●・・・
 		2,		# ・●・・●
 		2,		# ・●・●・
 		10,		# ・●・●●
 		2,		# ・●●・・
 		10,		# ・●●・●
-		10,		# ・●●●・
-		100,	# ・●●●●
+		20,		# ・●●●・
+		150,	# ・●●●●
 		1,		# ●・・・・
 		2,		# ●・・・●
 		2,		# ●・・●・
@@ -42,9 +42,9 @@ class Board:
 		6,		# ●●・・●
 		10,		# ●●・●・
 		100,	# ●●・●●
-		10,		# ●●●・・
+		15,		# ●●●・・
 		100,	# ●●●・●
-		100,	# ●●●●・
+		150,	# ●●●●・
 		9999,	# ●●●●●
 	]
 	#var nput
@@ -262,13 +262,14 @@ class Board:
 			v_eval[x] = eval_bitmap(v_black[x], v_white[x], N_VERT, next_color)
 			eval += v_eval[x]
 		var len = 5
+		var d = 1
 		for i in range(N_DIAGONAL):
 			u_eval[i] = eval_bitmap(u_black[i], u_white[i], len, next_color)
 			eval += u_eval[i]
 			d_eval[i] = eval_bitmap(d_black[i], d_white[i], len, next_color)
 			eval += d_eval[i]
-			if len < 11: len += 1
-			else: len -= 1
+			len += d
+			if len == 11: d = -1
 	func eval_putxy(x, y, next_color):	# (x, y) に着手した場合の差分評価
 		eval -= h_eval[y]
 		h_eval[y] = eval_bitmap(h_black[y], h_white[y], N_HORZ, EMPTY)

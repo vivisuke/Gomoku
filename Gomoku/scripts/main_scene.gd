@@ -118,6 +118,9 @@ func _input(event):
 	pass
 func do_put(x, y):
 	bd.put_color(x, y, next_color)
+	if !bd.is_legal_put(x, y, next_color):
+		bd.remove_color(x, y)
+		return
 	var sx = bd.is_six(x, y, next_color)
 	print("is_six = ", sx)
 	if next_color == g.BLACK && sx:
@@ -266,6 +269,17 @@ func unit_test():
 	assert( !b2.is_three(1, 0, g.BLACK) )	# 飛び三の場合
 	assert( !b2.is_three(2, 0, g.BLACK) )	# 飛び三の場合
 	assert( !b2.is_three(4, 0, g.BLACK) )	# 飛び三の場合
+	# 問題：｜・●●●◯ が高評価されてしまう？
+	b2.clear()
+	b2.put_color(2, 0, g.BLACK)
+	b2.put_color(3, 1, g.BLACK)
+	b2.put_color(4, 2, g.BLACK)
+	b2.put_color(5, 3, g.BLACK)
+	b2.put_color(6, 4, g.WHITE)
+	b2.calc_eval(g.WHITE)
+	print("calc_eval(): ", b2.eval)
+	#var t = b2.eval_bitmap(b2.d_black[8], b2.d_white[8], 9, g.WHITE)
+	#print("eval_bitmap(): ", t)
 	#
 	b2.clear()
 	b2.calc_eval(g.BLACK)
