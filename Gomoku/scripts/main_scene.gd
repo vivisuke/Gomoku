@@ -244,6 +244,28 @@ func unit_test():
 	assert( b2.is_four(2, 7, g.BLACK) )		# （連続）四の場合
 	assert( b2.is_four(3, 8, g.BLACK) )		# （連続）四の場合
 	assert( b2.is_four(4, 9, g.BLACK) )		# （連続）四の場合
+	# テスト：is_three(x, y, col) 
+	b2.clear()
+	b2.put_color(1, 0, g.BLACK)
+	b2.put_color(2, 0, g.BLACK)
+	b2.put_color(3, 0, g.BLACK)				# ｜・●●●・・…｜
+	assert( b2.is_three(1, 0, g.BLACK) )	# 三の場合
+	assert( b2.is_three(2, 0, g.BLACK) )	# 三の場合
+	assert( b2.is_three(3, 0, g.BLACK) )	# 三の場合
+	b2.put_color(5, 0, g.WHITE)				# ｜・●●●・◯…｜
+	assert( !b2.is_three(1, 0, g.BLACK) )	# 非活三の場合
+	assert( !b2.is_three(2, 0, g.BLACK) )	# 非活三の場合
+	assert( !b2.is_three(3, 0, g.BLACK) )	# 非活三の場合
+	b2.remove_color(3, 0)
+	b2.remove_color(5, 0)
+	b2.put_color(4, 0, g.BLACK)				# ｜・●●・●・…｜
+	assert( b2.is_three(1, 0, g.BLACK) )	# 飛び三の場合
+	assert( b2.is_three(2, 0, g.BLACK) )	# 飛び三の場合
+	assert( b2.is_three(4, 0, g.BLACK) )	# 飛び三の場合
+	b2.put_color(0, 0, g.WHITE)				# ｜◯●●・●・…｜
+	assert( !b2.is_three(1, 0, g.BLACK) )	# 飛び三の場合
+	assert( !b2.is_three(2, 0, g.BLACK) )	# 飛び三の場合
+	assert( !b2.is_three(4, 0, g.BLACK) )	# 飛び三の場合
 	#
 	b2.clear()
 	b2.calc_eval(g.BLACK)

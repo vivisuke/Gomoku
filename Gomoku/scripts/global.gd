@@ -354,8 +354,8 @@ class Board:
 			white >>= 1
 			p >>= 1
 		while p != 0:
-			if (white & 0b11111) == 0:
-				if is34table[black & 0b11111] >= FOUR: return true
+			if (white & 0b11111) == 0 && is34table[black & 0b11111] >= FOUR:
+				return true
 			black >>= 1
 			white >>= 1
 			p >>= 1
@@ -375,6 +375,43 @@ class Board:
 			if is_four_sub(1<<(10-y), v_white[x], v_black[x]): return true
 			if d[0] >= 0 && is_four_sub(d[1], d_white[d[0]], d_black[d[0]]): return true
 			if u[0] >= 0 && is_four_sub(u[1], u_white[u[0]], u_black[u[0]]): return true
+		return false
+	func is_three_sub(p: int, black:int, white: int, nbit):		# p に着手後、活三ができたか？
+		black <<= 1
+		white <<= 1
+		white |= 1 | (1<<(nbit+1))		# 壁を付加
+		while p > 0b100000:		# 着手箇所の影響範囲外を削除
+			black >>= 1
+			white >>= 1
+			p >>= 1
+		while p > 1:
+			if (white & 0b111110) == 0:
+				var b5 = black & 0b111110
+				if b5 == 0b011100 && ((white &0b1000000) == 0 || (white &0b0000001) == 0):
+					return true
+				if (b5 == 0b010110 || b5 == 0b011010) && (white &0b100001) == 0:
+					return true
+				if (b5 == 0b101100 || b5 == 0b110100) && (white &0b1000010) == 0:
+					return true
+			black >>= 1
+			white >>= 1
+			p >>= 1
+		return false
+	func is_three(x, y, col):		# (x, y) に着手後、活三ができたか？
+		var h = 1 << (N_HORZ - 1 - x)
+		var v = 1 << (N_HORZ - 1 - y)
+		var d = xyToDrIxMask(x, y)
+		var u = xyToUrIxMask(x, y)
+		if col == BLACK:
+			if is_three_sub(1<<(10-x), h_black[y], h_white[y], N_HORZ): return true
+			if is_three_sub(1<<(10-y), v_black[x], v_white[x], N_VERT): return true
+			if d[0] >= 0 && is_three_sub(d[1], d_black[d[0]], d_white[d[0]], d[2]): return true
+			if u[0] >= 0 && is_three_sub(u[1], u_black[u[0]], u_white[u[0]], u[2]): return true
+		elif col == WHITE:
+			if is_three_sub(1<<(10-x), h_white[y], h_black[y], N_HORZ): return true
+			if is_three_sub(1<<(10-y), v_white[x], v_black[x], N_VERT): return true
+			if d[0] >= 0 && is_three_sub(d[1], d_white[d[0]], d_black[d[0]], d[2]): return true
+			if u[0] >= 0 && is_three_sub(u[1], u_white[u[0]], u_black[u[0]], u[2]): return true
 		return false
 	func put_minmax(next_color):
 		#var op = Vector2i(-1, -1)

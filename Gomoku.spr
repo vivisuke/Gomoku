@@ -91,7 +91,7 @@
 0089 ◎ C 09/11 09/11 0.002│ToDo│|◀ ▶| 機能実装
 0090 ● C 09/11            │ToDo│move_hist は Board に移動
 0091 ◎ C 09/11 09/12 0.002│ToDo│is_four(x, y, col)：（活きている）四 or 飛び四
-0092 ● C 09/11            │ToDo│is_three(x, y, col)：（活きている）三 or 飛び三
+0092 ◎ C 09/11 09/12 0.002│ToDo│is_three(x, y, col)：（活きている）三 or 飛び三
 0093 ◎ C 09/12 09/12 0.002│ToDo│is34table：値を NONE = 0, THREE, FOUR に変更
 0094 ● C 09/12            │ToDo│
 0095 ● C 09/12            │ToDo│
