@@ -366,6 +366,7 @@ func _on_init_button_pressed():
 	#if put_pos != Vector2i(-1, -1):
 	#	#$Board/BGTileMap.set_cell(0, put_pos, -1, Vector2i(0, 0))
 	#	put_pos = Vector2i(-10, -10)
+	for i in range(eval_labels.size()): eval_labels[i].text = ""
 	update_view()
 func _on_start_stop_button_toggled(button_pressed):
 	game_started = button_pressed
