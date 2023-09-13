@@ -29,6 +29,7 @@ var put_pos = Vector2i(-10, -10)	# -10 for 画面外
 #var prev_put_pos = Vector2(-1, -1)
 var move_hist = []				# 着手履歴
 var move_ix = -1				# 着手済みIX
+var eval_labels = []
 
 func _ready():
 	#rng.randomize()		# Setups a time-based seed
@@ -41,9 +42,22 @@ func _ready():
 	#bd.put_color(6, 5, g.WHITE)
 	$HBC/UndoButton.disabled = true
 	update_view()
+	init_labels()
 	unit_test()
 	pass # Replace with function body.
 
+func init_labels():
+	for y in range(N_VERT):
+		for x in range(N_HORZ):
+			var lbl = Label.new()
+			lbl.text = ""
+			#lbl.text = "%d" % (x+y)
+			lbl.position = Vector2(x*CELL_WD, y*CELL_WD+10)
+			lbl.size.x = CELL_WD-10
+			lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			lbl.modulate = Color(1, 0, 0) # 赤色
+			$Board.add_child(lbl)
+			eval_labels.push_back(lbl)
 func update_view():
 	for y in range(N_VERT):
 		for x in range(N_HORZ):
@@ -401,9 +415,21 @@ func _on_white_player_selected(index):
 	white_player = index
 	pass # Replace with function body.
 
-
+func print_eval():
+	var ix = 0
+	for y in range(N_VERT):
+		for x in range(N_HORZ):
+			if bd.is_empty(x, y):
+				bd.put_color(x, y, next_color)
+				bd.calc_eval(next_color)
+				eval_labels[ix].text = "%d" % bd.eval
+				bd.remove_color(x, y)
+			else:
+				eval_labels[ix].text = ""
+			ix += 1
 func _on_rule_button_pressed():
-	bd.print_eval_ndiff(next_color)
+	print_eval()
+	#bd.print_eval_ndiff(next_color)
 	pass # Replace with function body.
 
 
