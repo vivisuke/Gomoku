@@ -1,7 +1,7 @@
 extends Node2D
 
 enum {
-	EMPTY = 0, BLACK, WHITE,
+	EMPTY = 0, BLACK, WHITE, UNKNOWN,
 	NONE = 0, ONE, TWO, THREE, FOUR, FIVE, SIX
 }
 const N_HORZ = 11
@@ -144,6 +144,23 @@ class Board:
 		var mask = 1 << (N_HORZ - 1 - x)
 		if (h_black[y]&mask) != 0: return BLACK
 		if (h_white[y]&mask) != 0: return WHITE
+		return EMPTY
+	func get_color_v(x, y):	# v_black, v_white のみを参照
+		var mask = 1 << (N_VERT - 1 - y)
+		if (v_black[x]&mask) != 0: return BLACK
+		if (v_white[x]&mask) != 0: return WHITE
+		return EMPTY
+	func get_color_u(x, y):	# u_black, u_white のみを参照
+		var t = xyToUrIxMask(x, y)
+		if t[0] < 0: return UNKNOWN
+		if (u_black[t[0]] & t[1]) != 0: return BLACK
+		if (u_white[t[0]] & t[1]) != 0: return WHITE
+		return EMPTY
+	func get_color_d(x, y):	# d_black, d_white のみを参照
+		var t = xyToDrIxMask(x, y)
+		if t[0] < 0: return UNKNOWN
+		if (d_black[t[0]] & t[1]) != 0: return BLACK
+		if (d_white[t[0]] & t[1]) != 0: return WHITE
 		return EMPTY
 	# 着手・盤面評価
 	func put_color(x, y, col):		# 前提：(x, y) は空欄、col：BLACK or WHITE
@@ -534,7 +551,33 @@ class Board:
 		assert(xyToUrIxMask(10, 1) == [7, 0b1, 10])
 		assert(xyToUrIxMask(1, 10) == [7, 0b01000000000, 10])
 		assert(xyToUrIxMask(10, 2) == [8, 0b1, 9])
-
+	func check_hv_bitmap() -> bool:
+		for y in range(N_VERT):
+			for x in range(N_HORZ):
+				if get_color(x, y) != get_color_v(x, y):
+					return false
+		#for y in range(N_VERT):
+		#	var my = 1 << (10-y)
+		#	for x in range(N_HORZ):
+		#		var mx = 1 << (10-x)
+		#		if ((h_black[y] & mx) != 0 && (v_black[x] & my) == 0 ||
+		#			(h_black[y] & mx) == 0 && (v_black[x] & my) != 0):
+		#			return false
+		#		if ((h_white[y] & mx) != 0 && (v_white[x] & my) == 0 ||
+		#			(h_white[y] & mx) == 0 && (v_white[x] & my) != 0):
+		#			return false
+		return true
+	func check_hud_bitmap() -> bool:
+		for y in range(N_VERT):
+			for x in range(N_HORZ):
+				var h = get_color(x, y)
+				var u = get_color_u(x, y)
+				if u != UNKNOWN && u != h:
+					return false
+				var d = get_color_d(x, y)
+				if d != UNKNOWN && d != h:
+					return false
+		return true
 func _ready():
 	pass # Replace with function body.
 func _process(delta):

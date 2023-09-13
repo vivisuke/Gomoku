@@ -9,6 +9,7 @@ const CELL_WD = 42
 var N_HORZ = g.N_HORZ
 var N_VERT = g.N_VERT
 var N_CELLS = N_HORZ*N_VERT
+const N_DIAGONAL = 6 + 1 + 6		# 斜め方向ビットマップ配列数
 
 var BOARD_ORG_X
 var BOARD_ORG_Y
@@ -132,6 +133,8 @@ func _input(event):
 	pass
 func do_put(x, y):
 	bd.put_color(x, y, next_color)
+	assert( bd.check_hv_bitmap() )
+	assert( bd.check_hud_bitmap() )
 	if !bd.is_legal_put(x, y, next_color):
 		bd.remove_color(x, y)
 		return
@@ -351,6 +354,23 @@ func unit_test():
 	b2.put_color(4, 6, g.WHITE)
 	b2.print_eval_ndiff(g.BLACK)
 	print("eval = ", b2.eval)
+	# 評価値対称性チェック
+	b2.clear()
+	b2.put_color(5, 4, g.BLACK)
+	b2.put_color(5, 6, g.BLACK)
+	b2.put_color(4, 5, g.BLACK)
+	b2.put_color(6, 5, g.BLACK)
+	b2.put_color(0, 0, g.WHITE)
+	b2.put_color(10, 0, g.WHITE)
+	b2.put_color(0, 10, g.WHITE)
+	b2.put_color(10, 10, g.WHITE)
+	b2.put_color(5, 3, g.BLACK)
+	var evu = b2.calc_eval(g.BLACK)
+	b2.remove_color(5, 3)
+	b2.put_color(5, 7, g.BLACK)
+	var evd = b2.calc_eval(g.BLACK)
+	b2.remove_color(5, 7)
+	assert( evu == evd )
 	#
 
 
@@ -417,17 +437,32 @@ func _on_white_player_selected(index):
 	pass # Replace with function body.
 
 func print_eval():
+	print("print_eval():")
 	var ix = 0
 	for y in range(N_VERT):
 		for x in range(N_HORZ):
 			if bd.is_empty(x, y):
 				bd.put_color(x, y, next_color)
-				bd.calc_eval(next_color)
-				eval_labels[ix].text = "%d" % bd.eval
+				if bd.is_legal_put(x, y, next_color):
+					bd.calc_eval(next_color)
+					eval_labels[ix].text = "%d" % bd.eval
+					if (x == 5 && y == 3) || (x == 5 && y == 8):
+						var txt = "(%d, %d):\n" % [x, y]
+						for i in range(N_VERT): txt += "%d, " % bd.h_eval[i]
+						txt += "\n"
+						for i in range(N_VERT): txt += "%d, " % bd.v_eval[i]
+						txt += "\n"
+						for i in range(N_DIAGONAL): txt += "%d, " %  bd.u_eval[i]
+						txt += "\n"
+						for i in range(N_DIAGONAL): txt += "%d, " %  bd.d_eval[i]
+						print(txt)
+				else:
+					eval_labels[ix].text = "N/A"
 				bd.remove_color(x, y)
 			else:
 				eval_labels[ix].text = ""
 			ix += 1
+	print("")
 func _on_rule_button_pressed():
 	print_eval()
 	#bd.print_eval_ndiff(next_color)
