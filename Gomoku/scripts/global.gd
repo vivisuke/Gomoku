@@ -8,6 +8,9 @@ const N_HORZ = 11
 const N_VERT = 11
 const N_DIAGONAL = 6 + 1 + 6		# 斜め方向ビットマップ配列数
 
+const ALPHA = -99999
+const BETA = 99999
+
 func xyToIX(x, y): return y*N_HORZ + x
 func ixToX(ix: int): return ix % N_HORZ
 func ixToY(ix: int): return ix / N_HORZ
@@ -46,6 +49,34 @@ class Board:
 		100,	# ●●●・●
 		150,	# ●●●●・
 		9999,	# ●●●●●
+	]
+	const prio_pos = [
+		[5, 5],		# 中央
+
+		[5, 4], [5, 6], [4, 5], [6, 5],
+		[4, 4], [6, 4], [4, 6], [6, 6], 
+
+		[4, 3], [5, 3], [6, 3], [4, 7], [5, 7], [6, 7], 
+		[3, 4], [3, 5], [3, 6], [7, 4], [7, 5], [7, 6], 
+		[3, 3], [7, 3], [3, 7], [7, 7], 
+
+		[3, 2], [4, 2], [5, 2], [6, 2], [7, 2], 
+		[3, 8], [4, 8], [5, 8], [6, 8], [7, 8], 
+		[2, 3], [2, 4], [2, 5], [2, 6], [2, 7], 
+		[8, 3], [8, 4], [8, 5], [8, 6], [8, 7], 
+		[2, 2], [8, 2], [2, 8], [8, 8], 
+
+		[2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], 
+		[2, 9], [3, 9], [4, 9], [5, 9], [6, 9], [7, 9], [8, 9], 
+		[1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7], [1, 8], 
+		[9, 2], [9, 3], [9, 4], [9, 5], [9, 6], [9, 7], [9, 8], 
+		[1, 1], [9, 1], [1, 9], [9, 9], 
+
+		[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], 
+		[1, 10], [2, 10], [3, 10], [4, 10], [5, 10], [6, 10], [7, 10], [8, 10], [9, 10], 
+		[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], [0, 8], [0, 9], 
+		[10, 1], [10, 2], [10, 3], [10, 4], [10, 5], [10, 6], [10, 7], [10, 8], [10, 9], 
+		[0, 0], [10, 0], [0, 10], [10, 10], 
 	]
 	#var nput
 	var verbose = false
@@ -460,7 +491,7 @@ class Board:
 		elif u[0] >= 0 && is_three_sub(u[1], u_black[u[0]], u_white[u[0]], u[2]):
 			n3 += 1
 		return n4 < 2 && n3 < 2
-	func put_minmax(next_color):
+	func put_minmax(next_color) -> Vector2i:
 		#var op = Vector2i(-1, -1)
 		var lst = []
 		if next_color == BLACK:		# 黒番
@@ -492,6 +523,76 @@ class Board:
 						elif eval == mn:
 							lst.push_back(Vector2i(x, y))
 						remove_color(x, y)
+		if lst.size() == 1: return lst[0]
+		var r = randi() % lst.size()
+		return lst[r]
+	func alpha_beta(next_color, alpha, beta, depth) -> int:
+		if depth <= 0:
+			calc_eval(next_color)
+			return eval
+		if next_color == BLACK:		# 黒番
+			for i in range(prio_pos.size()):
+				var x = prio_pos[i][0]
+				var y = prio_pos[i][1]
+				if is_empty(x, y):
+					put_color(x, y, next_color)
+					if is_legal_put(x, y, next_color):
+						var ev = alpha_beta(WHITE, alpha, beta, depth-1)
+						remove_color(x, y)
+						if ev > alpha:
+							alpha = ev
+						if alpha >= beta:
+							return alpha
+					else:
+						remove_color(x, y)
+			return alpha
+		else:						# 白番
+			for i in range(prio_pos.size()):
+				var x = prio_pos[i][0]
+				var y = prio_pos[i][1]
+				if is_empty(x, y):
+					put_color(x, y, next_color)
+					var ev = alpha_beta(BLACK, alpha, beta, depth-1)
+					remove_color(x, y)
+					if ev < beta:
+						beta = ev
+					if alpha >= beta:
+						return beta
+			return beta
+	func put_alpha_beta(next_color, depth) -> Vector2i:
+		print("depth = ", depth)
+		#var op = Vector2i(-1, -1)
+		var lst = []
+		if next_color == BLACK:		# 黒番
+			var alpha = ALPHA
+			for i in range(prio_pos.size()):
+				var x = prio_pos[i][0]
+				var y = prio_pos[i][1]
+				if is_empty(x, y):
+					put_color(x, y, next_color)
+					if is_legal_put(x, y, next_color):
+						var ev = alpha_beta(WHITE, alpha, BETA, depth-1)
+						if ev > alpha:
+							alpha = ev
+							lst = [Vector2i(x, y)]
+						elif ev == alpha:
+							lst.push_back(Vector2i(x, y))
+					remove_color(x, y)
+		else:						# 白番
+			var beta = 99999
+			for i in range(prio_pos.size()):
+				var x = prio_pos[i][0]
+				var y = prio_pos[i][1]
+				if is_empty(x, y):
+					put_color(x, y, next_color)
+					var ev = alpha_beta(WHITE, ALPHA, beta, depth-1)
+					#calc_eval(BLACK)
+					if ev < beta:
+						beta = ev
+						lst = [Vector2i(x, y)]
+					elif ev == beta:
+						lst.push_back(Vector2i(x, y))
+					remove_color(x, y)
 		if lst.size() == 1: return lst[0]
 		var r = randi() % lst.size()
 		return lst[r]
@@ -536,6 +637,8 @@ class Board:
 				mask >>= 1
 			print(txt)
 	func unit_test():
+		assert( prio_pos.size() == N_HORZ * N_VERT )
+		#
 		assert(xyToDrIxMask(0, 0) == [6, 0b10000000000, 11])
 		assert(xyToDrIxMask(10, 10) == [6, 0b1, 11])
 		assert(xyToDrIxMask(0, 1) == [5, 0b01000000000, 10])

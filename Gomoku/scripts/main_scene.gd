@@ -1,7 +1,7 @@
 extends Node2D
 
 enum {
-	HUMAN = 0, AI_RANDOM, AI_DEPTH_1, AI_DEPTH_2, AI_DEPTH_3, 
+	HUMAN = 0, AI_DEPTH_0, AI_DEPTH_1, AI_DEPTH_2, AI_DEPTH_3, 
 }
 const ID_GRAY = 0
 const ID_BG = 2
@@ -32,6 +32,7 @@ var put_pos = Vector2i(-10, -10)	# -10 for 画面外
 var move_hist = []				# 着手履歴
 var move_ix = -1				# 着手済みIX
 var eval_labels = []
+var calc_eval_pos = -1			# if >= 0: 空欄評価値計算中
 
 func _ready():
 	#rng.randomize()		# Setups a time-based seed
@@ -111,13 +112,32 @@ func update_next_underline():
 	$BlackPlayer/Underline.visible = game_started && next_color == g.BLACK
 func _process(delta):
 	if( game_started && !AI_thinking &&
-			(next_color == g.WHITE && white_player >= AI_RANDOM ||
-			next_color == g.BLACK && black_player >= AI_RANDOM) ):
+			(next_color == g.WHITE && white_player >= AI_DEPTH_0 ||
+			next_color == g.BLACK && black_player >= AI_DEPTH_0) ):
 		# AI の手番
 		AI_thinking = true
-		var op = bd.put_minmax(next_color)
+		#var op = bd.put_minmax(next_color)
+		var depth = (black_player if next_color == g.BLACK else white_player) - AI_DEPTH_0
+		var op = bd.put_alpha_beta(next_color, depth)
 		do_put(op.x, op.y)
 		AI_thinking = false
+	if calc_eval_pos >= 0:
+		var x = bd.prio_pos[calc_eval_pos][0]
+		var y = bd.prio_pos[calc_eval_pos][1]
+		var ix = y * N_HORZ + x
+		if bd.is_empty(x, y):
+			bd.put_color(x, y, next_color)
+			if bd.is_legal_put(x, y, next_color):
+				var ev = bd.alpha_beta(next_color, g.ALPHA, g.BETA, 1)
+				eval_labels[ix].text = "%d" % ev
+			else:
+				eval_labels[ix].text = "N/A"
+			bd.remove_color(x, y)
+		else:
+			eval_labels[ix].text = ""
+		calc_eval_pos += 1
+		if calc_eval_pos >= bd.prio_pos.size():
+			calc_eval_pos = -1
 	pass
 func _input(event):
 	if !game_started: return
@@ -313,6 +333,7 @@ func unit_test():
 	var ev1011 = b2.eval_bitmap(0b00001011000, 0, 11, g.BLACK)
 	b2.verbose = false
 	assert( ev1101 == ev1011 )
+	#var ev1011 = b2.eval_bitmap(0b000000110, 0, 11, g.BLACK)
 	#
 	b2.clear()
 	b2.calc_eval(g.BLACK)
@@ -462,16 +483,16 @@ func print_eval():
 				if bd.is_legal_put(x, y, next_color):
 					bd.calc_eval(next_color)
 					eval_labels[ix].text = "%d" % bd.eval
-					if (x == 5 && y == 3) || (x == 5 && y == 8):
-						var txt = "(%d, %d):\n" % [x, y]
-						for i in range(N_VERT): txt += "%d, " % bd.h_eval[i]
-						txt += "\n"
-						for i in range(N_VERT): txt += "%d, " % bd.v_eval[i]
-						txt += "\n"
-						for i in range(N_DIAGONAL): txt += "%d, " %  bd.u_eval[i]
-						txt += "\n"
-						for i in range(N_DIAGONAL): txt += "%d, " %  bd.d_eval[i]
-						print(txt)
+					#if (x == 5 && y == 3) || (x == 5 && y == 8):
+					#	var txt = "(%d, %d):\n" % [x, y]
+					#	for i in range(N_VERT): txt += "%d, " % bd.h_eval[i]
+					#	txt += "\n"
+					#	for i in range(N_VERT): txt += "%d, " % bd.v_eval[i]
+					#	txt += "\n"
+					#	for i in range(N_DIAGONAL): txt += "%d, " %  bd.u_eval[i]
+					#	txt += "\n"
+					#	for i in range(N_DIAGONAL): txt += "%d, " %  bd.d_eval[i]
+					#	print(txt)
 				else:
 					eval_labels[ix].text = "N/A"
 				bd.remove_color(x, y)
@@ -479,8 +500,29 @@ func print_eval():
 				eval_labels[ix].text = ""
 			ix += 1
 	print("")
+func print_eval_tbl():
+	print("print_eval_tbl():")
+	for i in range(bd.prio_pos.size()):
+		var x = bd.prio_pos[i][0]
+		var y = bd.prio_pos[i][1]
+		var ix = y * N_HORZ + x
+		if bd.is_empty(x, y):
+			bd.put_color(x, y, next_color)
+			if bd.is_legal_put(x, y, next_color):
+				#bd.calc_eval(next_color)
+				#eval_labels[ix].text = "%d" % bd.eval
+				var ev = bd.alpha_beta(next_color, g.ALPHA, g.BETA, 1)
+				eval_labels[ix].text = "%d" % ev
+			else:
+				eval_labels[ix].text = "N/A"
+			bd.remove_color(x, y)
+		else:
+			eval_labels[ix].text = ""
 func _on_rule_button_pressed():
-	print_eval()
+	for i in range(eval_labels.size()): eval_labels[i].text = ""
+	calc_eval_pos = 0
+	#print_eval()
+	#print_eval_tbl()	# prio_pos[] 順に表示
 	#bd.print_eval_ndiff(next_color)
 	pass # Replace with function body.
 
