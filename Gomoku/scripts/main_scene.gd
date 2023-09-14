@@ -128,7 +128,8 @@ func _process(delta):
 		if bd.is_empty(x, y):
 			bd.put_color(x, y, next_color)
 			if bd.is_legal_put(x, y, next_color):
-				var ev = bd.alpha_beta(next_color, g.ALPHA, g.BETA, 1)
+				var oppo = (g.BLACK + g.WHITE) - next_color
+				var ev = bd.alpha_beta(oppo, g.ALPHA, g.BETA, 1)
 				eval_labels[ix].text = "%d" % ev
 			else:
 				eval_labels[ix].text = "N/A"
