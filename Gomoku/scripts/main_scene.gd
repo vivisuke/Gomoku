@@ -129,7 +129,7 @@ func _process(delta):
 			bd.put_color(x, y, next_color)
 			if bd.is_legal_put(x, y, next_color):
 				var oppo = (g.BLACK + g.WHITE) - next_color
-				var ev = bd.alpha_beta(oppo, g.ALPHA, g.BETA, 1)
+				var ev = bd.alpha_beta(oppo, g.ALPHA, g.BETA, 2)
 				eval_labels[ix].text = "%d" % ev
 			else:
 				eval_labels[ix].text = "N/A"
@@ -424,7 +424,7 @@ func _on_init_button_pressed():
 	#if put_pos != Vector2i(-1, -1):
 	#	#$Board/BGTileMap.set_cell(0, put_pos, -1, Vector2i(0, 0))
 	#	put_pos = Vector2i(-10, -10)
-	for i in range(eval_labels.size()): eval_labels[i].text = ""
+	clear_eval_labels()
 	update_view()
 func _on_start_stop_button_toggled(button_pressed):
 	game_started = button_pressed
@@ -435,6 +435,7 @@ func _on_start_stop_button_toggled(button_pressed):
 		$StartStopButton.icon = $StartStopButton/StopTexture.texture
 		$BlackPlayer/OptionButton.disabled = true
 		$WhitePlayer/OptionButton.disabled = true
+		clear_eval_labels()
 	else:
 		$StartStopButton.text = "Start Game"
 		$StartStopButton.icon = $StartStopButton/PlayTexture.texture
@@ -519,8 +520,11 @@ func print_eval_tbl():
 			bd.remove_color(x, y)
 		else:
 			eval_labels[ix].text = ""
+func clear_eval_labels():
+	for i in range(eval_labels.size()):
+		eval_labels[i].text = ""
 func _on_rule_button_pressed():
-	for i in range(eval_labels.size()): eval_labels[i].text = ""
+	clear_eval_labels()
 	calc_eval_pos = 0
 	#print_eval()
 	#print_eval_tbl()	# prio_pos[] 順に表示
