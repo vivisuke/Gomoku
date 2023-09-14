@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://ditiwje3j3fsh"]
+[gd_scene load_steps=35 format=3 uid="uid://ditiwje3j3fsh"]
 
 [ext_resource type="Script" path="res://scripts/TitleBar.gd" id="1_3jkov"]
 [ext_resource type="Script" path="res://scripts/Board.gd" id="1_bcx5t"]
@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://buv5opysoy8ff" path="res://images/play_arrow_white_32.png" id="3_g71hd"]
 [ext_resource type="Texture2D" uid="uid://27onerr514r4" path="res://images/white_42.png" id="3_irbk1"]
 [ext_resource type="Texture2D" uid="uid://bt67q3bcmc8ab" path="res://images/stop_white_32.png" id="5_1f8o4"]
+[ext_resource type="Texture2D" uid="uid://ce30ow5a0tbjn" path="res://images/gray_42.png" id="9_1b6l6"]
 [ext_resource type="Script" path="res://scripts/Grid.gd" id="9_fwb4q"]
 [ext_resource type="Texture2D" uid="uid://dlv5mpubr21oq" path="res://images/BG_42.png" id="10_tqbab"]
 [ext_resource type="Texture2D" uid="uid://cr8wmdaub82ad" path="res://images/undo_black.png" id="11_w2j8t"]
@@ -28,6 +29,11 @@
 [ext_resource type="Texture2D" uid="uid://1blb4mf5fkkn" path="res://images/skip_next_white.png" id="25_1egmy"]
 [ext_resource type="Texture2D" uid="uid://b8dlsb0rboj4v" path="res://images/skip_next_gray.png" id="26_yi1hs"]
 
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_b40eb"]
+texture = ExtResource("9_1b6l6")
+texture_region_size = Vector2i(42, 42)
+0:0/0 = 0
+
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wnvxq"]
 texture = ExtResource("10_tqbab")
 texture_region_size = Vector2i(42, 42)
@@ -36,6 +42,7 @@ texture_region_size = Vector2i(42, 42)
 [sub_resource type="TileSet" id="TileSet_my21j"]
 tile_size = Vector2i(42, 42)
 sources/2 = SubResource("TileSetAtlasSource_wnvxq")
+sources/0 = SubResource("TileSetAtlasSource_b40eb")
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_uidoy"]
 texture = ExtResource("2_155xe")
@@ -207,6 +214,7 @@ script = ExtResource("1_bcx5t")
 [node name="BGTileMap" type="TileMap" parent="Board"]
 tile_set = SubResource("TileSet_my21j")
 format = 2
+layer_0/tile_data = PackedInt32Array(131074, 0, 0)
 
 [node name="PutCursor" type="TextureRect" parent="Board"]
 layout_mode = 0

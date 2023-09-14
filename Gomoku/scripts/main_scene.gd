@@ -3,7 +3,8 @@ extends Node2D
 enum {
 	HUMAN = 0, AI_RANDOM, AI_DEPTH_1, AI_DEPTH_2, AI_DEPTH_3, 
 }
-const BGID = 2
+const ID_GRAY = 0
+const ID_BG = 2
 const CELL_WD = 42
 
 var N_HORZ = g.N_HORZ
@@ -72,7 +73,7 @@ func update_view():
 	#if prev_put_pos.x >= 0:
 	#	#$Board/BGTileMap.set_cell(0, prev_put_pos, -1, Vector2i(0, 0))
 	if put_pos.x >= 0:
-		#$Board/BGTileMap.set_cell(0, put_pos, BGID, Vector2i(0, 0))
+		#$Board/BGTileMap.set_cell(0, put_pos, ID_BG, Vector2i(0, 0))
 		$Board/PutCursor.position = put_pos*CELL_WD
 		print("put_pos = ", put_pos)
 	else:
@@ -90,6 +91,15 @@ func update_view():
 	$HBC/BackButton.disabled = move_ix < 0 || game_started
 	$HBC/ForwardButton.disabled = move_hist.size() - 1 <= move_ix || game_started
 	$HBC/LastButton.disabled = move_hist.size() - 1 <= move_ix || game_started
+	for y in range(N_VERT):
+		for x in range(N_HORZ):
+			var id = -1
+			if next_color == g.BLACK && black_player == HUMAN && bd.is_empty(x, y):
+				bd.put_color(x, y, g.BLACK)
+				if !bd.is_legal_put(x, y, g.BLACK):
+					id = ID_GRAY
+				bd.remove_color(x, y)
+			$Board/BGTileMap.set_cell(0, Vector2i(x, y), id, Vector2i(0, 0))
 	pass
 func print_next_turn():
 	if next_color == g.BLACK:
@@ -425,7 +435,7 @@ func _on_undo_button_pressed():
 	$HBC/UndoButton.disabled = move_hist.is_empty()
 	if !move_hist.is_empty():
 		put_pos = move_hist.back()
-		#$Board/BGTileMap.set_cell(0, put_pos, BGID, Vector2i(0, 0))	# 直前着手強調
+		#$Board/BGTileMap.set_cell(0, put_pos, ID_BG, Vector2i(0, 0))	# 直前着手強調
 	else:
 		put_pos = Vector2i(-10, -10)
 
@@ -486,7 +496,7 @@ func _on_back_button_pressed():
 		if move_ix >= 0:
 			put_pos = move_hist[move_ix]
 			#var prev = move_hist[move_ix]
-			#$Board/BGTileMap.set_cell(0, prev, BGID, Vector2i(0, 0))
+			#$Board/BGTileMap.set_cell(0, prev, ID_BG, Vector2i(0, 0))
 		else:
 			put_pos = Vector2i(-10, -10)
 		next_color = (g.BLACK + g.WHITE) - next_color
@@ -499,7 +509,7 @@ func _on_forward_button_pressed():
 		move_ix += 1
 		put_pos = move_hist[move_ix]
 		bd.put_color(put_pos.x, put_pos.y, next_color)
-		#$Board/BGTileMap.set_cell(0, p, BGID, Vector2i(0, 0))
+		#$Board/BGTileMap.set_cell(0, p, ID_BG, Vector2i(0, 0))
 		next_color = (g.BLACK + g.WHITE) - next_color
 		update_view()
 	pass # Replace with function body.
