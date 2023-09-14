@@ -26,7 +26,7 @@ class Board:
 		2,		# ・●・・●
 		2,		# ・●・●・
 		10,		# ・●・●●
-		2,		# ・●●・・
+		4,		# ・●●・・
 		10,		# ・●●・●
 		20,		# ・●●●・
 		150,	# ・●●●●
@@ -48,6 +48,7 @@ class Board:
 		9999,	# ●●●●●
 	]
 	#var nput
+	var verbose = false
 	var n_space				# 空欄数
 	var eval = 0			# 評価値
 	var h_black = []		# 水平方向ビットマップ
@@ -249,6 +250,7 @@ class Board:
 		#		b5 == 0b11011 || b5 == 0b11101 || b5 == 0b11110)
 	func eval_bitmap(black, white, nbit, nxcol):		# bitmap（下位 nbit）を評価
 		if black == 0 && white == 0: return 0
+		if verbose: print("black = 0x%x" % black)
 		var ev = 0
 		for i in range(nbit - 4):
 			var b5 = black & 0x1f
@@ -258,6 +260,7 @@ class Board:
 					ev += evtable[b5]
 					if nxcol == BLACK && is_forced(b5, w5):
 						ev += evtable[b5] * 2
+					if verbose: print("b5 = 0x%x, ev = %d" % [b5, ev])
 				else:
 					pass	# 黒白両方ある場合は、評価値: 0
 			else:

@@ -298,6 +298,12 @@ func unit_test():
 	#var t = b2.eval_bitmap(b2.d_black[8], b2.d_white[8], 9, g.WHITE)
 	#print("eval_bitmap(): ", t)
 	#
+	b2.verbose = true
+	var ev1101 = b2.eval_bitmap(0b00011010000, 0, 11, g.BLACK)
+	var ev1011 = b2.eval_bitmap(0b00001011000, 0, 11, g.BLACK)
+	b2.verbose = false
+	assert( ev1101 == ev1011 )
+	#
 	b2.clear()
 	b2.calc_eval(g.BLACK)
 	assert(b2.eval == 0)
