@@ -32,7 +32,11 @@ var put_pos = Vector2i(-10, -10)	# -10 for 画面外
 var move_hist = []				# 着手履歴
 var move_ix = -1				# 着手済みIX
 var eval_labels = []
+var put_order = []				# 着手順序配列、要素：[eval, x, y]
+var put_order_ix = -1
 var calc_eval_pos = -1			# if >= 0: 空欄評価値計算中
+var alpha
+var beta
 
 func _ready():
 	#rng.randomize()		# Setups a time-based seed
@@ -58,7 +62,7 @@ func init_labels():
 			lbl.position = Vector2(x*CELL_WD, y*CELL_WD+10)
 			lbl.size.x = CELL_WD-10
 			lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-			lbl.modulate = Color(1, 0, 0) # 赤色
+			lbl.modulate = Color.RED		#(1, 0, 0) # 赤色
 			$Board.add_child(lbl)
 			eval_labels.push_back(lbl)
 func update_view():
@@ -139,6 +143,30 @@ func _process(delta):
 		calc_eval_pos += 1
 		if calc_eval_pos >= bd.prio_pos.size():
 			calc_eval_pos = -1
+	if put_order_ix >= 0:
+		var x = put_order[put_order_ix][1]
+		var y = put_order[put_order_ix][2]
+		var ix = y * N_HORZ + x
+		if bd.is_empty(x, y):
+			bd.put_color(x, y, next_color)
+			if bd.is_legal_put(x, y, next_color):
+				var oppo = (g.BLACK + g.WHITE) - next_color
+				var ev = bd.alpha_beta(oppo, alpha, beta, 2)	# 2 for ３手先読み
+				var col = Color.BLUE if ev >= 0 else Color.RED
+				eval_labels[ix].modulate = col
+				eval_labels[ix].text = "%d" % ev
+				#if next_color == g.BLACK:
+				#	alpha = max(alpha, ev)
+				#else:
+				#	beta = min(beta, ev)
+			else:
+				eval_labels[ix].text = "N/A"
+			bd.remove_color(x, y)
+		else:
+			eval_labels[ix].text = ""
+		put_order_ix += 1
+		if put_order_ix >= put_order.size():
+			put_order_ix = -1
 	pass
 func _input(event):
 	if !game_started: return
@@ -161,6 +189,8 @@ func _input(event):
 			#print(pos)
 			do_put(pos.x, pos.y)
 			#bd.print_eval_ndiff(next_color)
+			put_order_ix = -1
+			calc_eval_pos = -1
 	pass
 func do_put(x, y):
 	bd.put_color(x, y, next_color)
@@ -520,12 +550,34 @@ func print_eval_tbl():
 			bd.remove_color(x, y)
 		else:
 			eval_labels[ix].text = ""
+func build_put_order():
+	put_order = []
+	for i in range(bd.prio_pos.size()):
+		var x = bd.prio_pos[i][0]
+		var y = bd.prio_pos[i][1]
+		var ix = y * N_HORZ + x
+		if bd.is_empty(x, y):
+			bd.put_color(x, y, next_color)
+			if bd.is_legal_put(x, y, next_color):
+				bd.calc_eval(next_color)
+				put_order.push_back([bd.eval, x, y])
+			bd.remove_color(x, y)
+	#print(put_order, "\n")
+	if next_color == g.BLACK:
+		put_order.sort_custom(func(lhs, rhs): return lhs[0] > rhs[0])
+	else:
+		put_order.sort_custom(func(lhs, rhs): return lhs[0] < rhs[0])
+	#print(put_order, "\n")
+	alpha = g.ALPHA
+	beta = g.BETA
+	put_order_ix = 0
 func clear_eval_labels():
 	for i in range(eval_labels.size()):
 		eval_labels[i].text = ""
 func _on_rule_button_pressed():
 	clear_eval_labels()
-	calc_eval_pos = 0
+	build_put_order()
+	#calc_eval_pos = 0
 	#print_eval()
 	#print_eval_tbl()	# prio_pos[] 順に表示
 	#bd.print_eval_ndiff(next_color)

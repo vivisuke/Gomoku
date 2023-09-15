@@ -575,8 +575,8 @@ class Board:
 						if ev > alpha:
 							alpha = ev
 							lst = [Vector2i(x, y)]
-						elif ev == alpha:
-							lst.push_back(Vector2i(x, y))
+						#elif ev == alpha:
+						#	lst.push_back(Vector2i(x, y))
 					remove_color(x, y)
 		else:						# 白番
 			var beta = 99999
@@ -590,8 +590,8 @@ class Board:
 					if ev < beta:
 						beta = ev
 						lst = [Vector2i(x, y)]
-					elif ev == beta:
-						lst.push_back(Vector2i(x, y))
+					#elif ev == beta:
+					#	lst.push_back(Vector2i(x, y))
 					remove_color(x, y)
 		if lst.size() == 1: return lst[0]
 		var r = randi() % lst.size()
