@@ -78,6 +78,11 @@ class Board:
 		[10, 1], [10, 2], [10, 3], [10, 4], [10, 5], [10, 6], [10, 7], [10, 8], [10, 9], 
 		[0, 0], [10, 0], [0, 10], [10, 10], 
 	]
+	const IX_EV = 0
+	const IX_B3 = 1
+	const IX_W3 = 2
+	const IX_B4 = 3
+	const IX_W4 = 4
 	#var nput
 	var verbose = false
 	var n_space				# 空欄数
@@ -90,6 +95,14 @@ class Board:
 	var u_white = []		# 右上方向ビットマップ
 	var d_black = []		# 右下方向ビットマップ
 	var d_white = []		# 右下方向ビットマップ
+	var h_b_three = []		# 各水平方向ラインの 三 の数
+	var h_w_four = []		# 各水平方向ラインの 四 の数
+	var v_b_three = []		# 各垂直方向ラインの 三 の数
+	var v_w_four = []		# 各垂直方向ラインの 四 の数
+	var u_b_three = []		# 各右上方向ラインの 三 の数
+	var u_w_four = []		# 各右上方向ラインの 四 の数
+	var d_b_three = []		# 各右下方向ラインの 三 の数
+	var d_w_four = []		# 各右下方向ラインの 四 の数
 	var h_eval = []			# 水平方向評価値（黒から見た値）
 	var v_eval = []			# 垂直方向評価値
 	var u_eval = []			# 右上方向評価値
@@ -306,6 +319,34 @@ class Board:
 			black >>= 1
 			white >>= 1
 		return ev
+	# bitmap（下位 nbit）を評価、三・四の個数を数える
+	# return: [eval, b3, w3, b4, w4]
+	func eval_bitmap_34(black, white, nbit, nxcol):
+		var rv = [0, 0, 0, 0, 0]
+		if black != 0 || white != 0:
+			for i in range(nbit - 4):
+				var b5 = black & 0x1f
+				var w5 = white & 0x1f
+				if b5 != 0:
+					if w5 == 0:
+						rv[IX_EV] += evtable[b5]
+						#if verbose: print("b5 = 0x%x, ev = %d" % [b5, ev])
+						var is34 = is34table[b5]
+						if is34 == THREE: rv[IX_B3] += 1
+						elif is34 == FOUR: rv[IX_B4] += 1
+					else:
+						pass	# 黒白両方ある場合は、評価値: 0
+				else:
+					if w5 != 0:
+						rv[IX_EV] -= evtable[w5]
+						var is34 = is34table[w5]
+						if is34 == THREE: rv[IX_W3] += 1
+						elif is34 == FOUR: rv[IX_W4] += 1
+					else:
+						pass	# 黒白両方空欄のみの場合は、評価値: 0
+				black >>= 1
+				white >>= 1
+		return rv
 	func calc_eval(next_color):			# 評価関数計算、非差分計算
 		eval = 0
 		for y in range(N_VERT):
