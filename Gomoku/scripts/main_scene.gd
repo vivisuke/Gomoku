@@ -19,6 +19,7 @@ var BOARD_ORG
 var bd
 var rng = RandomNumberGenerator.new()
 var AI_thinking = false
+var search_depth = 0
 var waiting = 0;				# ウェイト中カウンタ
 var game_started = false		# ゲーム中か？
 var game_over = false			# 勝敗がついたか？
@@ -37,6 +38,7 @@ var put_order_ix = -1
 var calc_eval_pos = -1			# if >= 0: 空欄評価値計算中
 var alpha
 var beta
+var best_pos
 
 func _ready():
 	#rng.randomize()		# Setups a time-based seed
@@ -48,6 +50,7 @@ func _ready():
 	#bd.put_color(5, 5, g.BLACK)
 	#bd.put_color(6, 5, g.WHITE)
 	$HBC/UndoButton.disabled = true
+	$Board/SearchCursor.position = Vector2(-10, -10)*CELL_WD
 	update_view()
 	init_labels()
 	unit_test()
@@ -121,10 +124,45 @@ func _process(delta):
 		# AI の手番
 		AI_thinking = true
 		#var op = bd.put_minmax(next_color)
+		#search_depth = (black_player if next_color == g.BLACK else white_player) - AI_DEPTH_0
+		bd.build_put_order(next_color)
+		alpha = g.ALPHA
+		beta = g.BETA
+		var x = bd.put_order[bd.put_order_ix][1]
+		var y = bd.put_order[bd.put_order_ix][2]
+		$Board/SearchCursor.position = Vector2(x, y) * CELL_WD
+		#var depth = (black_player if next_color == g.BLACK else white_player) - AI_DEPTH_0
+		#var op = bd.do_alpha_beta_search(next_color, depth)
+		#do_put(op.x, op.y)
+		#AI_thinking = false
+	if bd.put_order_ix >= 0 && bd.put_order_ix < bd.put_order.size():
+		var x = bd.put_order[bd.put_order_ix][1]
+		var y = bd.put_order[bd.put_order_ix][2]
+		bd.put_color(x, y, next_color)
+		#bd.calc_eval(next_color)
+		var oppo = (g.BLACK + g.WHITE) - next_color
 		var depth = (black_player if next_color == g.BLACK else white_player) - AI_DEPTH_0
-		var op = bd.put_alpha_beta(next_color, depth)
-		do_put(op.x, op.y)
-		AI_thinking = false
+		var ev = bd.alpha_beta(oppo, alpha, beta, depth - 1)
+		bd.remove_color(x, y)
+		if next_color == g.BLACK:
+			if bd.eval > alpha:
+				alpha = bd.eval
+				best_pos = [x, y]
+		else:
+			if bd.eval < beta:
+				beta = bd.eval
+				best_pos = [x, y]
+		bd.put_order_ix += 1
+		if bd.put_order_ix < bd.put_order.size():
+			x = bd.put_order[bd.put_order_ix][1]
+			y = bd.put_order[bd.put_order_ix][2]
+			$Board/SearchCursor.position = Vector2(x, y) * CELL_WD
+		else:
+			print("best_pos = ", best_pos)
+			do_put(best_pos[0], best_pos[1])
+			bd.put_order_ix = -1
+			AI_thinking = false
+			$Board/SearchCursor.position = Vector2(-10, -10)*CELL_WD
 	if calc_eval_pos >= 0:
 		var x = bd.prio_pos[calc_eval_pos][0]
 		var y = bd.prio_pos[calc_eval_pos][1]
@@ -449,6 +487,8 @@ func _on_init_button_pressed():
 	won_color = g.EMPTY
 	move_hist.clear()
 	move_ix = -1
+	bd.put_order_ix = -1
+	AI_thinking = false
 	$HBC/UndoButton.disabled = true
 	put_pos = Vector2i(-10, -10)
 	#if put_pos != Vector2i(-1, -1):

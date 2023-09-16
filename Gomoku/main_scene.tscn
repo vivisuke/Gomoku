@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://ditiwje3j3fsh"]
+[gd_scene load_steps=36 format=3 uid="uid://ditiwje3j3fsh"]
 
 [ext_resource type="Script" path="res://scripts/TitleBar.gd" id="1_3jkov"]
 [ext_resource type="Script" path="res://scripts/Board.gd" id="1_bcx5t"]
@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://ce30ow5a0tbjn" path="res://images/gray_42.png" id="9_1b6l6"]
 [ext_resource type="Script" path="res://scripts/Grid.gd" id="9_fwb4q"]
 [ext_resource type="Texture2D" uid="uid://dlv5mpubr21oq" path="res://images/BG_42.png" id="10_tqbab"]
+[ext_resource type="Texture2D" uid="uid://gw84gp23vu14" path="res://images/pink_42.png" id="11_1hf0g"]
 [ext_resource type="Texture2D" uid="uid://cr8wmdaub82ad" path="res://images/undo_black.png" id="11_w2j8t"]
 [ext_resource type="Texture2D" uid="uid://dk64tuxwhkcyo" path="res://images/undo_white.png" id="12_sjx1h"]
 [ext_resource type="Texture2D" uid="uid://hl2kdbh54uj0" path="res://images/undo_gray.png" id="13_i33cc"]
@@ -221,6 +222,12 @@ layout_mode = 0
 offset_right = 42.0
 offset_bottom = 42.0
 texture = ExtResource("10_tqbab")
+
+[node name="SearchCursor" type="TextureRect" parent="Board"]
+layout_mode = 0
+offset_right = 42.0
+offset_bottom = 42.0
+texture = ExtResource("11_1hf0g")
 
 [node name="Grid" type="ColorRect" parent="Board"]
 layout_mode = 0

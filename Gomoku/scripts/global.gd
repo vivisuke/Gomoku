@@ -96,6 +96,8 @@ class Board:
 	var d_eval = []			# 右下方向評価値
 	var move_hist = []				# 着手履歴
 	var move_ix = -1				# 着手済みIX
+	var put_order = []		# ソート済み着手順序、要素：[評価値, x, y]
+	var put_order_ix = -1	# 次評価要素インデックス
 	func _init():
 		h_black.resize(N_VERT)
 		h_white.resize(N_VERT)
@@ -526,6 +528,27 @@ class Board:
 		if lst.size() == 1: return lst[0]
 		var r = randi() % lst.size()
 		return lst[r]
+	func build_put_order(next_color):
+		put_order = []
+		for i in range(prio_pos.size()):
+			var x = prio_pos[i][0]
+			var y = prio_pos[i][1]
+			var ix = y * N_HORZ + x
+			if is_empty(x, y):
+				put_color(x, y, next_color)
+				if is_legal_put(x, y, next_color):
+					calc_eval(next_color)
+					put_order.push_back([eval, x, y])
+				remove_color(x, y)
+		#print(put_order, "\n")
+		if next_color == BLACK:
+			put_order.sort_custom(func(lhs, rhs): return lhs[0] > rhs[0])
+		else:
+			put_order.sort_custom(func(lhs, rhs): return lhs[0] < rhs[0])
+		#print(put_order, "\n")
+		#alpha = g.ALPHA
+		#beta = g.BETA
+		put_order_ix = 0
 	func alpha_beta(next_color, alpha, beta, depth) -> int:
 		if depth <= 0:
 			calc_eval(next_color)
@@ -559,43 +582,82 @@ class Board:
 					if alpha >= beta:
 						return beta
 			return beta
-	func put_alpha_beta(next_color, depth) -> Vector2i:
+	func do_alpha_beta_search(next_color, depth) -> Vector2i:
 		print("depth = ", depth)
 		#var op = Vector2i(-1, -1)
+		var ev_pos = []		# 要素：[評価値, x, y] 配列
 		var lst = []
+		var best = Vector2i(-1, -1)
 		if next_color == BLACK:		# 黒番
-			var alpha = ALPHA
 			for i in range(prio_pos.size()):
 				var x = prio_pos[i][0]
 				var y = prio_pos[i][1]
 				if is_empty(x, y):
-					put_color(x, y, next_color)
-					if is_legal_put(x, y, next_color):
-						var ev = alpha_beta(WHITE, alpha, BETA, depth-1)
-						if ev > alpha:
-							alpha = ev
-							lst = [Vector2i(x, y)]
-						#elif ev == alpha:
-						#	lst.push_back(Vector2i(x, y))
+					put_color(x, y, BLACK)
+					if is_legal_put(x, y, BLACK):
+						calc_eval(WHITE)
+						ev_pos.push_back([eval, x, y])
 					remove_color(x, y)
+			ev_pos.sort_custom(func(lhs, rhs): return lhs[0] > rhs[0])
+			if depth <= 1:
+				# done：最大値要素をシャフル
+				var ev = ev_pos[0][0]
+				var sz = 1
+				while (sz < ev_pos.size() && ev_pos[sz][0] == ev):
+					sz += 1
+				if sz > 1:
+					ev_pos.resize(sz)
+					ev_pos.shuffle()
+				best = Vector2i(ev_pos[0][1], ev_pos[0][2])
+			else:
+				var alpha = ALPHA
+				for i in range(ev_pos.size()):
+					var x = ev_pos[i][1]
+					var y = ev_pos[i][2]
+					if is_empty(x, y):
+						put_color(x, y, BLACK)
+						if is_legal_put(x, y, BLACK):
+							var ev = alpha_beta(WHITE, alpha, BETA, depth-1)
+							if ev > alpha:
+								alpha = ev
+								best = Vector2i(x, y)
+						remove_color(x, y)
 		else:						# 白番
-			var beta = 99999
 			for i in range(prio_pos.size()):
 				var x = prio_pos[i][0]
 				var y = prio_pos[i][1]
 				if is_empty(x, y):
-					put_color(x, y, next_color)
-					var ev = alpha_beta(WHITE, ALPHA, beta, depth-1)
-					#calc_eval(BLACK)
-					if ev < beta:
-						beta = ev
-						lst = [Vector2i(x, y)]
-					#elif ev == beta:
-					#	lst.push_back(Vector2i(x, y))
+					put_color(x, y, WHITE)
+					calc_eval(BLACK)
+					ev_pos.push_back([eval, x, y])
 					remove_color(x, y)
-		if lst.size() == 1: return lst[0]
-		var r = randi() % lst.size()
-		return lst[r]
+			ev_pos.sort_custom(func(lhs, rhs): return lhs[0] < rhs[0])
+			if depth <= 1:
+				# done：最大値要素をシャフル
+				var ev = ev_pos[0][0]
+				var sz = 1
+				while (sz < ev_pos.size() && ev_pos[sz][0] == ev):
+					sz += 1
+				if sz > 1:
+					ev_pos.resize(sz)
+					ev_pos.shuffle()
+				best = Vector2i(ev_pos[0][1], ev_pos[0][2])
+			else:
+				var beta = 99999
+				for i in range(ev_pos.size()):
+					var x = ev_pos[i][1]
+					var y = ev_pos[i][2]
+					if is_empty(x, y):
+						put_color(x, y, WHITE)
+						var ev = alpha_beta(BLACK, ALPHA, beta, depth-1)
+						if ev < beta:
+							beta = ev
+							best = Vector2i(x, y)
+						remove_color(x, y)
+		return best
+		#if lst.size() == 1: return lst[0]
+		#var r = randi() % lst.size()
+		#return lst[r]
 	func print():
 		for y in range(N_VERT):
 			var txt = ""
