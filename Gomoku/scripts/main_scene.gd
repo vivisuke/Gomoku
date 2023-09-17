@@ -501,7 +501,34 @@ func unit_test():
 	assert( b2.n_white_three == 1 )
 	assert( b2.n_black_four == 0 )
 	assert( b2.n_white_four == 0 )
-
+	b2.clear()
+	b2.put_color(3, 3, g.BLACK)
+	b2.put_color(4, 4, g.BLACK)
+	b2.put_color(6, 6, g.BLACK)
+	b2.put_color(7, 7, g.BLACK)
+	assert( b2.n_black_three == 2 )
+	assert( b2.n_white_three == 0 )
+	assert( b2.n_black_four == 1 )
+	assert( b2.n_white_four == 0 )
+	# 評価関数差分計算
+	b2.clear()
+	assert( b2.eval == 0 )
+	b2.put_color(0, 0, g.BLACK)
+	print("eval = ", b2.eval)
+	print("h_eval[0] = ", b2.h_eval[0])
+	print("h_eval[1] = ", b2.h_eval[1])
+	print("v_eval[0] = ", b2.v_eval[0])
+	print("d_eval[6] = ", b2.d_eval[6])
+	print("d_eval[5] = ", b2.d_eval[5])
+	assert( b2.calc_eval_diff(g.WHITE) > 0 )
+	b2.put_color(0, 1, g.WHITE)
+	print("eval = ", b2.eval)
+	print("h_eval[0] = ", b2.h_eval[0])
+	print("h_eval[1] = ", b2.h_eval[1])
+	print("v_eval[0] = ", b2.v_eval[0])
+	print("d_eval[6] = ", b2.d_eval[6])
+	print("d_eval[5] = ", b2.d_eval[5])
+	assert( b2.calc_eval_diff(g.BLACK) < 0 )		# 白の方が中央にあり、黒は端っこ
 
 
 func _on_init_button_pressed():

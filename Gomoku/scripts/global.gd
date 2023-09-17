@@ -403,6 +403,8 @@ class Board:
 				black >>= 1
 				white >>= 1
 		return rv
+	func calc_eval_diff(next_color):	# 評価関数計算、差分計算
+		return eval
 	func calc_eval(next_color):			# 評価関数計算、非差分計算
 		eval = 0
 		for y in range(N_VERT):
@@ -437,23 +439,24 @@ class Board:
 		#
 		eval -= v_eval[x]
 		rv= eval_bitmap_34(v_black[x], v_white[x], N_VERT)
-		v_eval[y] = rv[IX_EV]
-		eval += v_eval[y]
-		n_black_three += rv[IX_B3] - v_b_three[y]
-		v_b_three[y] = rv[IX_B3]
-		n_white_three += rv[IX_W3] - v_w_three[y]
-		v_w_three[y] = rv[IX_W3]
-		n_black_four += rv[IX_B4] - v_b_four[y]
-		v_b_four[y] = rv[IX_B4]
-		n_white_four += rv[IX_W4] - v_w_four[y]
-		v_w_four[y] = rv[IX_W4]
+		v_eval[x] = rv[IX_EV]
 		eval += v_eval[x]
+		n_black_three += rv[IX_B3] - v_b_three[x]
+		v_b_three[x] = rv[IX_B3]
+		n_white_three += rv[IX_W3] - v_w_three[x]
+		v_w_three[x] = rv[IX_W3]
+		n_black_four += rv[IX_B4] - v_b_four[x]
+		v_b_four[x] = rv[IX_B4]
+		n_white_four += rv[IX_W4] - v_w_four[x]
+		v_w_four[x] = rv[IX_W4]
+		#
 		var t = xyToUrIxMask(x, y)
 		var ix = t[0]
 		if ix >= 0:
 			eval -= u_eval[ix]
 			rv = eval_bitmap_34(u_black[ix], u_white[ix], t[2])
 			u_eval[ix] = rv[IX_EV]
+			eval += u_eval[ix]
 			n_black_three += rv[IX_B3] - u_b_three[ix]
 			u_b_three[ix] = rv[IX_B3]
 			n_white_three += rv[IX_W3] - u_w_three[ix]
@@ -462,13 +465,13 @@ class Board:
 			u_b_four[ix] = rv[IX_B4]
 			n_white_four += rv[IX_W4] - u_w_four[ix]
 			u_w_four[ix] = rv[IX_W4]
-			eval += u_eval[ix]
 		t = xyToDrIxMask(x, y)
 		ix = t[0]
 		if ix >= 0:
 			eval -= d_eval[ix]
 			rv= eval_bitmap_34(d_black[ix], d_white[ix], t[2])
 			d_eval[ix] = rv[IX_EV]
+			eval += d_eval[ix]
 			n_black_three += rv[IX_B3] - d_b_three[ix]
 			d_b_three[ix] = rv[IX_B3]
 			n_white_three += rv[IX_W3] - d_w_three[ix]
@@ -477,7 +480,6 @@ class Board:
 			d_b_four[ix] = rv[IX_B4]
 			n_white_four += rv[IX_W4] - d_w_four[ix]
 			d_w_four[ix] = rv[IX_W4]
-			eval += d_eval[ix]
 		return eval
 	func is_five_sub(bitmap: int):		# 着手後、五目並んだか？
 		#var a = bitmap
