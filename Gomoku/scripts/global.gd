@@ -321,7 +321,7 @@ class Board:
 		return ev
 	# bitmap（下位 nbit）を評価、三・四の個数を数える
 	# return: [eval, b3, w3, b4, w4]
-	func eval_bitmap_34(black, white, nbit, nxcol):
+	func eval_bitmap_34(black, white, nbit):
 		var rv = [0, 0, 0, 0, 0]
 		if black != 0 || white != 0:
 			for i in range(nbit - 4):
@@ -760,6 +760,47 @@ class Board:
 		assert(xyToUrIxMask(10, 1) == [7, 0b1, 10])
 		assert(xyToUrIxMask(1, 10) == [7, 0b01000000000, 10])
 		assert(xyToUrIxMask(10, 2) == [8, 0b1, 9])
+		#
+		var rv = eval_bitmap_34(0b0011100, 0, 7)
+		assert( rv[IX_B3] == 3 )
+		assert( rv[IX_B4] == 0 )
+		assert( rv[IX_W3] == 0 )
+		assert( rv[IX_W4] == 0 )
+		rv = eval_bitmap_34(0b0010100, 0, 7)
+		assert( rv[IX_B3] == 0 )
+		assert( rv[IX_B4] == 0 )
+		assert( rv[IX_W3] == 0 )
+		assert( rv[IX_W4] == 0 )
+		rv = eval_bitmap_34(0b00110100, 0, 8)
+		assert( rv[IX_B3] == 2 )
+		assert( rv[IX_B4] == 0 )
+		assert( rv[IX_W3] == 0 )
+		assert( rv[IX_W4] == 0 )
+		rv = eval_bitmap_34(0, 0b0011100, 7)
+		assert( rv[IX_B3] == 0 )
+		assert( rv[IX_B4] == 0 )
+		assert( rv[IX_W3] == 3 )
+		assert( rv[IX_W4] == 0 )
+		rv = eval_bitmap_34(0, 0b0010100, 7)
+		assert( rv[IX_B3] == 0 )
+		assert( rv[IX_B4] == 0 )
+		assert( rv[IX_W3] == 0 )
+		assert( rv[IX_W4] == 0 )
+		rv = eval_bitmap_34(0, 0b00110100, 8)
+		assert( rv[IX_B3] == 0 )
+		assert( rv[IX_B4] == 0 )
+		assert( rv[IX_W3] == 2 )
+		assert( rv[IX_W4] == 0 )
+		rv = eval_bitmap_34(0b011110, 0, 6)
+		assert( rv[IX_B3] == 0 )
+		assert( rv[IX_B4] == 2 )
+		assert( rv[IX_W3] == 0 )
+		assert( rv[IX_W4] == 0 )
+		rv = eval_bitmap_34(0, 0b011110, 6)
+		assert( rv[IX_B3] == 0 )
+		assert( rv[IX_B4] == 0 )
+		assert( rv[IX_W3] == 0 )
+		assert( rv[IX_W4] == 2 )
 	func check_hv_bitmap() -> bool:
 		for y in range(N_VERT):
 			for x in range(N_HORZ):
