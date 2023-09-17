@@ -529,6 +529,43 @@ func unit_test():
 	print("d_eval[6] = ", b2.d_eval[6])
 	print("d_eval[5] = ", b2.d_eval[5])
 	assert( b2.calc_eval_diff(g.BLACK) < 0 )		# 白の方が中央にあり、黒は端っこ
+	b2.put_color(1, 0, g.BLACK)
+	print("eval = ", b2.eval)
+	assert( b2.calc_eval_diff(g.WHITE) > 0 )
+	b2.put_color(1, 1, g.WHITE)
+	print("eval = ", b2.eval)
+	assert( b2.calc_eval_diff(g.BLACK) < 0 )		# 白の方が中央にあり、黒は端っこ
+	b2.put_color(2, 0, g.BLACK)
+	print("eval = ", b2.eval)
+	assert( b2.calc_eval_diff(g.WHITE) > 0 )
+	b2.put_color(2, 1, g.WHITE)
+	print("eval = ", b2.eval)
+	print("n_black_three = ", b2.n_black_three)
+	print("n_white_three = ", b2.n_white_three)
+	print("n_black_four = ", b2.n_black_four)
+	print("n_white_four = ", b2.n_white_four)
+	assert( b2.calc_eval_diff(g.BLACK) < 0 )		# 白の方が中央にあり、黒は端っこ
+	b2.put_color(3, 0, g.BLACK)
+	print("eval = ", b2.eval)
+	assert( b2.calc_eval_diff(g.WHITE) > 0 )
+	b2.put_color(3, 1, g.WHITE)
+	print("n_black_four = ", b2.n_black_four)
+	print("n_white_four = ", b2.n_white_four)
+	print("eval = ", b2.eval)
+	assert( b2.calc_eval_diff(g.BLACK) > 0 )		# 次の手番の黒に四が出来ている
+	b2.clear()
+	b2.put_color(2, 0, g.BLACK)
+	b2.put_color(3, 0, g.BLACK)
+	b2.put_color(4, 0, g.BLACK)
+	b2.put_color(2, 1, g.WHITE)
+	b2.put_color(3, 1, g.WHITE)
+	b2.put_color(4, 1, g.WHITE)
+	print("eval = ", b2.eval)
+	print("n_black_three = ", b2.n_black_three)
+	print("n_white_three = ", b2.n_white_three)
+	print("n_black_four = ", b2.n_black_four)
+	print("n_white_four = ", b2.n_white_four)
+	assert( b2.calc_eval_diff(g.BLACK) > 0 )		# 次の手番の黒に三が出来ている
 
 
 func _on_init_button_pressed():

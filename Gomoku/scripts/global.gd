@@ -404,6 +404,20 @@ class Board:
 				white >>= 1
 		return rv
 	func calc_eval_diff(next_color):	# 評価関数計算、差分計算
+		if next_color == BLACK:
+			if n_black_four != 0:
+				return 9999
+			if n_white_four != 0:
+				return eval - 200
+			if n_black_three != 0:
+				return eval + 50
+		else:
+			if n_white_four != 0:
+				return -9999
+			if n_black_four != 0:
+				return eval + 200
+			if n_white_three != 0:
+				return eval - 50
 		return eval
 	func calc_eval(next_color):			# 評価関数計算、非差分計算
 		eval = 0
