@@ -477,7 +477,31 @@ func unit_test():
 	var evd = b2.calc_eval(g.BLACK)
 	b2.remove_color(5, 7)
 	assert( evu == evd )
-	#
+	# 黒白三・四数チェック
+	b2.clear()
+	assert( b2.n_black_three == 0 )
+	assert( b2.n_white_three == 0 )
+	assert( b2.n_black_four == 0 )
+	assert( b2.n_white_four == 0 )
+	b2.put_color(0, 0, g.BLACK)
+	b2.put_color(1, 0, g.BLACK)
+	assert( b2.n_black_three == 0 )
+	assert( b2.n_white_three == 0 )
+	assert( b2.n_black_four == 0 )
+	assert( b2.n_white_four == 0 )
+	b2.put_color(2, 0, g.BLACK)
+	assert( b2.n_black_three == 1 )
+	assert( b2.n_white_three == 0 )
+	assert( b2.n_black_four == 0 )
+	assert( b2.n_white_four == 0 )
+	b2.put_color(0, 1, g.WHITE)
+	b2.put_color(0, 2, g.WHITE)
+	b2.put_color(0, 3, g.WHITE)
+	assert( b2.n_black_three == 1 )
+	assert( b2.n_white_three == 1 )
+	assert( b2.n_black_four == 0 )
+	assert( b2.n_white_four == 0 )
+
 
 
 func _on_init_button_pressed():

@@ -87,6 +87,10 @@ class Board:
 	var verbose = false
 	var n_space				# 空欄数
 	var eval = 0			# 評価値
+	var n_black_three		# 黒三個数
+	var n_black_four		# 黒四個数
+	var n_white_three		# 白三個数
+	var n_white_four		# 白四個数
 	var h_black = []		# 水平方向ビットマップ
 	var h_white = []		# 水平方向ビットマップ
 	var v_black = []		# 垂直方向ビットマップ
@@ -95,14 +99,22 @@ class Board:
 	var u_white = []		# 右上方向ビットマップ
 	var d_black = []		# 右下方向ビットマップ
 	var d_white = []		# 右下方向ビットマップ
-	var h_b_three = []		# 各水平方向ラインの 三 の数
-	var h_w_four = []		# 各水平方向ラインの 四 の数
-	var v_b_three = []		# 各垂直方向ラインの 三 の数
-	var v_w_four = []		# 各垂直方向ラインの 四 の数
-	var u_b_three = []		# 各右上方向ラインの 三 の数
-	var u_w_four = []		# 各右上方向ラインの 四 の数
-	var d_b_three = []		# 各右下方向ラインの 三 の数
-	var d_w_four = []		# 各右下方向ラインの 四 の数
+	var h_b_three = []		# 各水平方向ラインの黒 三 の数
+	var h_w_three = []		# 各水平方向ラインの白 三 の数
+	var h_b_four = []		# 各水平方向ラインの黒 四 の数
+	var h_w_four = []		# 各水平方向ラインの白 四 の数
+	var v_b_three = []		# 各垂直方向ラインの黒 三 の数
+	var v_w_three = []		# 各垂直方向ラインの白 三 の数
+	var v_b_four = []		# 各垂直方向ラインの黒 四 の数
+	var v_w_four = []		# 各垂直方向ラインの白 四 の数
+	var u_b_three = []		# 各右上方向ラインの黒 三 の数
+	var u_w_three = []		# 各右上方向ラインの白 三 の数
+	var u_b_four = []		# 各右上方向ラインの黒 四 の数
+	var u_w_four = []		# 各右上方向ラインの白 四 の数
+	var d_b_three = []		# 各右下方向ラインの黒 三 の数
+	var d_w_three = []		# 各右下方向ラインの白 三 の数
+	var d_b_four = []		# 各右下方向ラインの黒 四 の数
+	var d_w_four = []		# 各右下方向ラインの白 四 の数
 	var h_eval = []			# 水平方向評価値（黒から見た値）
 	var v_eval = []			# 垂直方向評価値
 	var u_eval = []			# 右上方向評価値
@@ -120,6 +132,30 @@ class Board:
 		u_white.resize(N_DIAGONAL)
 		d_black.resize(N_DIAGONAL)
 		d_white.resize(N_DIAGONAL)
+		h_b_three.resize(N_VERT)
+		h_w_three.resize(N_VERT)
+		v_black.resize(N_HORZ)
+		v_white.resize(N_HORZ)
+		u_black.resize(N_DIAGONAL)
+		u_white.resize(N_DIAGONAL)
+		d_black.resize(N_DIAGONAL)
+		d_white.resize(N_DIAGONAL)
+		h_b_three.resize(N_VERT)
+		h_w_three.resize(N_VERT)
+		h_b_four.resize(N_VERT)
+		h_w_four.resize(N_VERT)
+		v_b_three.resize(N_VERT)
+		v_w_three.resize(N_VERT)
+		v_b_four.resize(N_VERT)
+		v_w_four.resize(N_VERT)
+		u_b_three.resize(N_DIAGONAL)
+		u_w_three.resize(N_DIAGONAL)
+		u_b_four.resize(N_DIAGONAL)
+		u_w_four.resize(N_DIAGONAL)
+		d_b_three.resize(N_DIAGONAL)
+		d_w_three.resize(N_DIAGONAL)
+		d_b_four.resize(N_DIAGONAL)
+		d_w_four.resize(N_DIAGONAL)
 		h_eval.resize(N_VERT)
 		v_eval.resize(N_HORZ)
 		u_eval.resize(N_DIAGONAL)
@@ -131,6 +167,10 @@ class Board:
 		#nput = 0
 		n_space = N_HORZ * N_VERT
 		eval = 0
+		n_black_three = 0
+		n_black_four = 0
+		n_white_three = 0
+		n_white_four = 0
 		h_black.fill(0)
 		h_white.fill(0)
 		v_black.fill(0)
@@ -139,6 +179,22 @@ class Board:
 		u_white.fill(0)
 		d_black.fill(0)
 		d_white.fill(0)
+		h_b_three.fill(0)
+		h_w_three.fill(0)
+		h_b_four.fill(0)
+		h_w_four.fill(0)
+		v_b_three.fill(0)
+		v_w_three.fill(0)
+		v_b_four.fill(0)
+		v_w_four.fill(0)
+		u_b_three.fill(0)
+		u_w_three.fill(0)
+		u_b_four.fill(0)
+		u_w_four.fill(0)
+		d_b_three.fill(0)
+		d_w_three.fill(0)
+		d_b_four.fill(0)
+		d_w_four.fill(0)
 		h_eval.fill(0)
 		v_eval.fill(0)
 		u_eval.fill(0)
@@ -364,31 +420,64 @@ class Board:
 			eval += d_eval[i]
 			len += d
 			if len == 11: d = -1
-	func eval_putxy(x, y, next_color):	# (x, y) に着手した場合の差分評価
+	# (x, y) に着手した場合の評価値差分評価
+	func eval_putxy(x, y, next_color):
 		eval -= h_eval[y]
-		h_eval[y] = eval_bitmap(h_black[y], h_white[y], N_HORZ, EMPTY)
+		var rv = eval_bitmap_34(h_black[y], h_white[y], N_HORZ)
+		h_eval[y] = rv[IX_EV]
 		eval += h_eval[y]
+		n_black_three += rv[IX_B3] - h_b_three[y]
+		h_b_three[y] = rv[IX_B3]
+		n_white_three += rv[IX_W3] - h_w_three[y]
+		h_w_three[y] = rv[IX_W3]
+		n_black_four += rv[IX_B4] - h_b_four[y]
+		h_b_four[y] = rv[IX_B4]
+		n_white_four += rv[IX_W4] - h_w_four[y]
+		h_w_four[y] = rv[IX_W4]
+		#
 		eval -= v_eval[x]
-		v_eval[x] = eval_bitmap(v_black[x], v_white[x], N_VERT, EMPTY)
+		rv= eval_bitmap_34(v_black[x], v_white[x], N_VERT)
+		v_eval[y] = rv[IX_EV]
+		eval += v_eval[y]
+		n_black_three += rv[IX_B3] - v_b_three[y]
+		v_b_three[y] = rv[IX_B3]
+		n_white_three += rv[IX_W3] - v_w_three[y]
+		v_w_three[y] = rv[IX_W3]
+		n_black_four += rv[IX_B4] - v_b_four[y]
+		v_b_four[y] = rv[IX_B4]
+		n_white_four += rv[IX_W4] - v_w_four[y]
+		v_w_four[y] = rv[IX_W4]
 		eval += v_eval[x]
 		var t = xyToUrIxMask(x, y)
-		if t[0] >= 0:
-			eval -= u_eval[t[0]]
-			u_eval[t[0]] = eval_bitmap(u_black[t[0]], u_white[t[0]], t[2], EMPTY)
-			eval += u_eval[t[0]]
+		var ix = t[0]
+		if ix >= 0:
+			eval -= u_eval[ix]
+			rv = eval_bitmap_34(u_black[ix], u_white[ix], t[2])
+			u_eval[ix] = rv[IX_EV]
+			n_black_three += rv[IX_B3] - u_b_three[ix]
+			u_b_three[ix] = rv[IX_B3]
+			n_white_three += rv[IX_W3] - u_w_three[ix]
+			u_w_three[ix] = rv[IX_W3]
+			n_black_four += rv[IX_B4] - u_b_four[ix]
+			u_b_four[ix] = rv[IX_B4]
+			n_white_four += rv[IX_W4] - u_w_four[ix]
+			u_w_four[ix] = rv[IX_W4]
+			eval += u_eval[ix]
 		t = xyToDrIxMask(x, y)
-		if t[0] >= 0:
-			eval -= d_eval[t[0]]
-			d_eval[t[0]] = eval_bitmap(d_black[t[0]], d_white[t[0]], t[2], EMPTY)
-			eval += d_eval[t[0]]
-		# done: 差分計算
-		#var ev = 0
-		#for i in range(N_HORZ):
-		#	ev += h_eval[i]
-		#	ev += v_eval[i]
-		#for i in range(N_DIAGONAL):
-		#	ev += u_eval[i]
-		#	ev += d_eval[i]
+		ix = t[0]
+		if ix >= 0:
+			eval -= d_eval[ix]
+			rv= eval_bitmap_34(d_black[ix], d_white[ix], t[2])
+			d_eval[ix] = rv[IX_EV]
+			n_black_three += rv[IX_B3] - d_b_three[ix]
+			d_b_three[ix] = rv[IX_B3]
+			n_white_three += rv[IX_W3] - d_w_three[ix]
+			d_w_three[ix] = rv[IX_W3]
+			n_black_four += rv[IX_B4] - d_b_four[ix]
+			d_b_four[ix] = rv[IX_B4]
+			n_white_four += rv[IX_W4] - d_w_four[ix]
+			d_w_four[ix] = rv[IX_W4]
+			eval += d_eval[ix]
 		return eval
 	func is_five_sub(bitmap: int):		# 着手後、五目並んだか？
 		#var a = bitmap
@@ -801,6 +890,10 @@ class Board:
 		assert( rv[IX_B4] == 0 )
 		assert( rv[IX_W3] == 0 )
 		assert( rv[IX_W4] == 2 )
+		rv = eval_bitmap_34(0b111000, 0, 6)
+		assert( rv[IX_B3] == 1 )
+		rv = eval_bitmap_34(0b011100, 0, 6)
+		assert( rv[IX_B3] == 2 )
 	func check_hv_bitmap() -> bool:
 		for y in range(N_VERT):
 			for x in range(N_HORZ):
