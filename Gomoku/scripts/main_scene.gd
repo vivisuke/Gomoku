@@ -124,6 +124,9 @@ func _process(delta):
 			next_color == g.BLACK && black_player >= AI_DEPTH_0) ):
 		# AI の手番
 		AI_thinking = true
+		bd.n_calc_eval = 0
+		start_msec = Time.get_ticks_msec()
+		print("Time.msec = ", start_msec)
 		#var op = bd.put_minmax(next_color)
 		#search_depth = (black_player if next_color == g.BLACK else white_player) - AI_DEPTH_0
 		bd.build_put_order(next_color)
@@ -161,8 +164,10 @@ func _process(delta):
 		else:
 			print("best_pos = ", best_pos)
 			do_put(best_pos[0], best_pos[1])
-			start_msec = Time.get_ticks_msec()
-			print("Time.msec = ", )
+			var end_msec = Time.get_ticks_msec()
+			print("Time.msec = ", end_msec)
+			print("dur = ", end_msec - start_msec)
+			print("n_calc_eval = ", bd.n_calc_eval)
 			bd.put_order_ix = -1
 			AI_thinking = false
 			$Board/SearchCursor.position = Vector2(-10, -10)*CELL_WD

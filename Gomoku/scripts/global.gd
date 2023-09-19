@@ -86,6 +86,7 @@ class Board:
 	#var nput
 	var verbose = false
 	var n_space				# 空欄数
+	var n_calc_eval = 0		# 評価ノード数
 	var eval = 0			# 評価値
 	var n_black_three		# 黒三個数
 	var n_black_four		# 黒四個数
@@ -418,6 +419,7 @@ class Board:
 				white >>= 1
 		return rv
 	func calc_eval_diff(next_color):	# 評価関数計算、差分計算
+		n_calc_eval += 1
 		if next_color == BLACK:
 			if n_black_four != 0:
 				return 9999
