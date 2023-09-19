@@ -40,6 +40,7 @@ var alpha
 var beta
 var best_pos
 var start_msec = 0
+var print_count = 0
 
 func _ready():
 	#rng.randomize()		# Setups a time-based seed
@@ -132,16 +133,19 @@ func _process(delta):
 		bd.build_put_order(next_color)
 		alpha = g.ALPHA
 		beta = g.BETA
-		var x = bd.put_order[bd.put_order_ix][1]
-		var y = bd.put_order[bd.put_order_ix][2]
-		$Board/SearchCursor.position = Vector2(x, y) * CELL_WD
+		var x = bd.put_order[bd.put_order_ix][g.IX_X]
+		var y = bd.put_order[bd.put_order_ix][g.IX_Y]
+		$Board/SearchCursor.position = Vector2(x, y) * CELL_WD		# 先読み箇所強調
+		print_count = 10			# 上位10箇所の評価値プリント
 		#var depth = (black_player if next_color == g.BLACK else white_player) - AI_DEPTH_0
 		#var op = bd.do_alpha_beta_search(next_color, depth)
 		#do_put(op.x, op.y)
 		#AI_thinking = false
 	if bd.put_order_ix >= 0 && bd.put_order_ix < bd.put_order.size():
-		var x = bd.put_order[bd.put_order_ix][1]
-		var y = bd.put_order[bd.put_order_ix][2]
+		# アルファベータ法によるAI着手決定
+		# 着手順は事前に決定され bd.put_order[] に格納されている（要素：[ev, x, y]）
+		var x = bd.put_order[bd.put_order_ix][g.IX_X]
+		var y = bd.put_order[bd.put_order_ix][g.IX_Y]
 		bd.put_color(x, y, next_color)
 		#bd.calc_eval(next_color)
 		var oppo = (g.BLACK + g.WHITE) - next_color
@@ -149,17 +153,20 @@ func _process(delta):
 		var ev = bd.alpha_beta(oppo, alpha, beta, depth - 1)
 		bd.remove_color(x, y)
 		if next_color == g.BLACK:
-			if bd.eval > alpha:
-				alpha = bd.eval
+			if ev > alpha:
+				alpha = ev
 				best_pos = [x, y]
 		else:
-			if bd.eval < beta:
-				beta = bd.eval
+			if ev < beta:
+				beta = ev
 				best_pos = [x, y]
+		if print_count > 0:
+			print("eval(%2d, %2d) = %4d" % [x, y, ev])
+			print_count -= 1
 		bd.put_order_ix += 1
 		if bd.put_order_ix < bd.put_order.size():
-			x = bd.put_order[bd.put_order_ix][1]
-			y = bd.put_order[bd.put_order_ix][2]
+			x = bd.put_order[bd.put_order_ix][g.IX_X]
+			y = bd.put_order[bd.put_order_ix][g.IX_Y]
 			$Board/SearchCursor.position = Vector2(x, y) * CELL_WD
 		else:
 			print("best_pos = ", best_pos)
@@ -190,9 +197,9 @@ func _process(delta):
 		if calc_eval_pos >= bd.prio_pos.size():
 			calc_eval_pos = -1
 			print("Time.msec = ", Time.get_ticks_msec())
-	if put_order_ix >= 0:
-		var x = put_order[put_order_ix][1]
-		var y = put_order[put_order_ix][2]
+	if put_order_ix >= 0:		# アルファベータ法による評価値計算＆画面表示
+		var x = put_order[put_order_ix][g.IX_X]
+		var y = put_order[put_order_ix][g.IX_Y]
 		var ix = y * N_HORZ + x
 		if bd.is_empty(x, y):
 			bd.put_color(x, y, next_color)
@@ -586,8 +593,28 @@ func unit_test():
 	print("n_black_four = ", b2.n_black_four)
 	print("n_white_four = ", b2.n_white_four)
 	assert( b2.calc_eval_diff(g.BLACK) > 0 )		# 次の手番の黒に三が出来ている
-
-
+	#
+	b2.clear()
+	b2.put_color(6, 3, g.BLACK)
+	b2.put_color(6, 4, g.BLACK)
+	b2.put_color(6, 5, g.BLACK)
+	b2.put_color(7, 6, g.BLACK)
+	b2.put_color(8, 6, g.BLACK)
+	b2.put_color(5, 3, g.WHITE)
+	b2.put_color(7, 3, g.WHITE)
+	b2.put_color(4, 4, g.WHITE)
+	b2.put_color(8, 4, g.WHITE)		# 黒 (6, 6) で四三
+	b2.put_color(6, 2, g.WHITE)		# 四三の逆を止める
+	b2.put_color(6, 6, g.BLACK)		# 黒：四三
+	b2.print()
+	var e34 = b2.calc_eval_diff(g.WHITE)
+	print("e34 = ", e34)
+	b2.put_color(6, 7, g.WHITE)		# 白：四を止める
+	b2.print()
+	e34 = b2.calc_eval_diff(g.BLACK)
+	print("e34 = ", e34)
+	#
+	pass
 func _on_init_button_pressed():
 	if game_started: return
 	bd.clear()

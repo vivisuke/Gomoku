@@ -2,7 +2,8 @@ extends Node2D
 
 enum {
 	EMPTY = 0, BLACK, WHITE, UNKNOWN,
-	NONE = 0, ONE, TWO, THREE, FOUR, FIVE, SIX
+	NONE = 0, ONE, TWO, THREE, FOUR, FIVE, SIX,
+	IX_EVAL = 0, IX_X, IX_Y,
 }
 const N_HORZ = 11
 const N_VERT = 11
@@ -421,17 +422,23 @@ class Board:
 	func calc_eval_diff(next_color):	# 評価関数計算、差分計算
 		n_calc_eval += 1
 		if next_color == BLACK:
-			if n_black_four != 0:
+			if n_black_four != 0:		# 四が出来ている
 				return 9999
-			if n_white_four != 0:
-				return eval - 200
+			if n_white_four != 0:		# 白に四が出来ている
+				if n_white_three != 0:
+					return eval - 2000	# 白に四三が出来ている
+				else:
+					return eval - 200
 			if n_black_three != 0:
 				return eval + 50
 		else:
-			if n_white_four != 0:
+			if n_white_four != 0:		# 四が出来ている
 				return -9999
-			if n_black_four != 0:
-				return eval + 200
+			if n_black_four != 0:		# 黒に四が出来ている
+				if n_black_three != 0:
+					return eval + 2000	# 黒に四三が出来ている
+				else:
+					return eval + 200
 			if n_white_three != 0:
 				return eval - 50
 		return eval
@@ -708,6 +715,7 @@ class Board:
 			put_order.sort_custom(func(lhs, rhs): return lhs[0] > rhs[0])
 		else:
 			put_order.sort_custom(func(lhs, rhs): return lhs[0] < rhs[0])
+		# undone: 最大/最小値の部分をシャフル
 		#print(put_order, "\n")
 		#alpha = g.ALPHA
 		#beta = g.BETA
