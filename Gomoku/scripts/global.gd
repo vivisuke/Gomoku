@@ -697,8 +697,9 @@ class Board:
 			if is_empty(x, y):
 				put_color(x, y, next_color)
 				if is_legal_put(x, y, next_color):
-					calc_eval(next_color)
-					put_order.push_back([eval, x, y])
+					#calc_eval(next_color)
+					var ev = calc_eval_diff((BLACK+WHITE)-next_color)
+					put_order.push_back([ev, x, y])
 				remove_color(x, y)
 		#print(put_order, "\n")
 		if next_color == BLACK:
