@@ -715,6 +715,15 @@ class Board:
 			put_order.sort_custom(func(lhs, rhs): return lhs[0] > rhs[0])
 		else:
 			put_order.sort_custom(func(lhs, rhs): return lhs[0] < rhs[0])
+		var v = put_order[0][IX_EVAL]
+		var sz = 1
+		while sz < put_order.size() && put_order[sz][IX_EVAL] == v: sz += 1
+		if sz > 1:
+			var ta = []
+			ta.resize(sz)
+			for i in range(sz): ta[i] = put_order[i]
+			ta.shuffle()
+			for i in range(sz): put_order[i] = ta[i]
 		# undone: 最大/最小値の部分をシャフル
 		#print(put_order, "\n")
 		#alpha = g.ALPHA
