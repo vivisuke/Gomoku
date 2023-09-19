@@ -593,6 +593,17 @@ func unit_test():
 	print("n_black_four = ", b2.n_black_four)
 	print("n_white_four = ", b2.n_white_four)
 	assert( b2.calc_eval_diff(g.BLACK) > 0 )		# 次の手番の黒に三が出来ている
+	b2.clear()
+	b2.put_color(0, 0, g.BLACK)
+	b2.put_color(1, 0, g.BLACK)
+	b2.put_color(2, 0, g.BLACK)
+	b2.put_color(3, 0, g.BLACK)
+	b2.put_color(4, 0, g.BLACK)		# 黒：五が出来ている
+	b2.put_color(0, 1, g.WHITE)
+	b2.put_color(1, 1, g.WHITE)
+	b2.put_color(2, 1, g.WHITE)
+	b2.put_color(3, 1, g.WHITE)		# 白：活きている四
+	assert( b2.calc_eval_diff(g.WHITE) > 1000 )		# 次の手番の黒に三が出来ている
 	#
 	b2.clear()
 	b2.put_color(6, 3, g.BLACK)

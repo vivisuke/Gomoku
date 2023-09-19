@@ -423,7 +423,7 @@ class Board:
 		n_calc_eval += 1
 		if next_color == BLACK:
 			if n_black_four != 0:		# 四が出来ている
-				return 9999
+				return eval + 2000
 			if n_white_four != 0:		# 白に四が出来ている
 				if n_white_three != 0:
 					return eval - 2000	# 白に四三が出来ている
@@ -433,7 +433,7 @@ class Board:
 				return eval + 50
 		else:
 			if n_white_four != 0:		# 四が出来ている
-				return -9999
+				return eval - 2000
 			if n_black_four != 0:		# 黒に四が出来ている
 				if n_black_three != 0:
 					return eval + 2000	# 黒に四三が出来ている
