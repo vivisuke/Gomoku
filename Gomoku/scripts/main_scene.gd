@@ -39,6 +39,7 @@ var calc_eval_pos = -1			# if >= 0: 空欄評価値計算中
 var alpha
 var beta
 var best_pos
+var start_msec = 0
 
 func _ready():
 	#rng.randomize()		# Setups a time-based seed
@@ -160,6 +161,8 @@ func _process(delta):
 		else:
 			print("best_pos = ", best_pos)
 			do_put(best_pos[0], best_pos[1])
+			start_msec = Time.get_ticks_msec()
+			print("Time.msec = ", )
 			bd.put_order_ix = -1
 			AI_thinking = false
 			$Board/SearchCursor.position = Vector2(-10, -10)*CELL_WD
@@ -181,6 +184,7 @@ func _process(delta):
 		calc_eval_pos += 1
 		if calc_eval_pos >= bd.prio_pos.size():
 			calc_eval_pos = -1
+			print("Time.msec = ", Time.get_ticks_msec())
 	if put_order_ix >= 0:
 		var x = put_order[put_order_ix][1]
 		var y = put_order[put_order_ix][2]
@@ -205,6 +209,9 @@ func _process(delta):
 		put_order_ix += 1
 		if put_order_ix >= put_order.size():
 			put_order_ix = -1
+			var end_msec = Time.get_ticks_msec()
+			print("Time.msec = ", end_msec)
+			print("dur = ", end_msec - start_msec)
 	pass
 func _input(event):
 	if !game_started: return
@@ -489,24 +496,32 @@ func unit_test():
 	assert( b2.n_white_three == 0 )
 	assert( b2.n_black_four == 0 )
 	assert( b2.n_white_four == 0 )
-	b2.put_color(2, 0, g.BLACK)
-	assert( b2.n_black_three == 1 )
+	b2.put_color(2, 0, g.BLACK)			# ｜●●●・・…
+	assert( b2.n_black_three == 0 )
 	assert( b2.n_white_three == 0 )
 	assert( b2.n_black_four == 0 )
 	assert( b2.n_white_four == 0 )
 	b2.put_color(0, 1, g.WHITE)
 	b2.put_color(0, 2, g.WHITE)
 	b2.put_color(0, 3, g.WHITE)
+	assert( b2.n_black_three == 0 )
+	assert( b2.n_white_three == 0 )
+	assert( b2.n_black_four == 0 )
+	assert( b2.n_white_four == 0 )
+	b2.clear()
+	b2.put_color(2, 0, g.BLACK)
+	b2.put_color(3, 0, g.BLACK)
+	b2.put_color(4, 0, g.BLACK)
 	assert( b2.n_black_three == 1 )
-	assert( b2.n_white_three == 1 )
+	assert( b2.n_white_three == 0 )
 	assert( b2.n_black_four == 0 )
 	assert( b2.n_white_four == 0 )
 	b2.clear()
 	b2.put_color(3, 3, g.BLACK)
 	b2.put_color(4, 4, g.BLACK)
 	b2.put_color(6, 6, g.BLACK)
-	b2.put_color(7, 7, g.BLACK)
-	assert( b2.n_black_three == 2 )
+	b2.put_color(7, 7, g.BLACK)			# ｜・・・●●・●●・・…
+	assert( b2.n_black_three == 0 )
 	assert( b2.n_white_three == 0 )
 	assert( b2.n_black_four == 1 )
 	assert( b2.n_white_four == 0 )
@@ -698,6 +713,8 @@ func build_put_order():
 	#print(put_order, "\n")
 	alpha = g.ALPHA
 	beta = g.BETA
+	start_msec = Time.get_ticks_msec()
+	print("Time.msec = ", start_msec)
 	put_order_ix = 0
 func clear_eval_labels():
 	for i in range(eval_labels.size()):
