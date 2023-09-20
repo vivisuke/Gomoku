@@ -147,23 +147,27 @@ func _process(delta):
 		var x = bd.put_order[bd.put_order_ix][g.IX_X]
 		var y = bd.put_order[bd.put_order_ix][g.IX_Y]
 		bd.put_color(x, y, next_color)
-		#bd.calc_eval(next_color)
-		var oppo = (g.BLACK + g.WHITE) - next_color
-		var depth = (black_player if next_color == g.BLACK else white_player) - AI_DEPTH_0
-		var ev = bd.alpha_beta(oppo, alpha, beta, depth - 1)
-		bd.remove_color(x, y)
-		if next_color == g.BLACK:
-			if ev > alpha:
-				alpha = ev
-				best_pos = [x, y]
+		if bd.is_five(x, y, next_color):	# 五が出来た場合
+			best_pos = [x, y]
+			bd.put_order_ix = bd.put_order.size()	# 以降の着手評価はパス
 		else:
-			if ev < beta:
-				beta = ev
-				best_pos = [x, y]
-		if print_count > 0:
-			print("eval(%2d, %2d) = %4d" % [x, y, ev])
-			print_count -= 1
-		bd.put_order_ix += 1
+			#bd.calc_eval(next_color)
+			var oppo = (g.BLACK + g.WHITE) - next_color
+			var depth = (black_player if next_color == g.BLACK else white_player) - AI_DEPTH_0
+			var ev = bd.alpha_beta(oppo, alpha, beta, depth - 1)
+			bd.remove_color(x, y)
+			if next_color == g.BLACK:
+				if ev > alpha:
+					alpha = ev
+					best_pos = [x, y]
+			else:
+				if ev < beta:
+					beta = ev
+					best_pos = [x, y]
+			if print_count > 0:
+				print("eval(%2d, %2d) = %4d" % [x, y, ev])
+				print_count -= 1
+			bd.put_order_ix += 1
 		if bd.put_order_ix < bd.put_order.size():
 			x = bd.put_order[bd.put_order_ix][g.IX_X]
 			y = bd.put_order[bd.put_order_ix][g.IX_Y]

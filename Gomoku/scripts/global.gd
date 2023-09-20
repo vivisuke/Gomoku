@@ -721,9 +721,13 @@ class Board:
 			if is_empty(x, y):
 				put_color(x, y, next_color)
 				if is_legal_put(x, y, next_color):
-					#calc_eval(next_color)
-					var ev = calc_eval_diff((BLACK+WHITE)-next_color)
-					put_order.push_back([ev, x, y])
+					if is_five(x, y, next_color):	# 五が出来た場合
+						var ev = 9999 if next_color == BLACK else -9999
+						put_order.push_back([ev, x, y])
+					else:
+						#calc_eval(next_color)
+						var ev = calc_eval_diff((BLACK+WHITE)-next_color)
+						put_order.push_back([ev, x, y])
 				remove_color(x, y)
 		#print(put_order, "\n")
 		if next_color == BLACK:
