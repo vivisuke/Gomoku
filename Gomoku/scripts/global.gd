@@ -383,7 +383,10 @@ class Board:
 		var rv = [0, 0, 0, 0, 0]
 		if black != 0 || white != 0:
 			var not_zero = black | white | (1<<nbit)
-			var is_lsb_zero : bool = false
+			#var is_lt_black = black & (1<<nbit)
+			#var is_rt_zero : bool = false
+			var is_rt_black : bool = false
+			var is_rt_white : bool = false
 			for i in range(nbit - 4):
 				var b5 = black & 0x1f
 				var w5 = white & 0x1f
@@ -392,29 +395,41 @@ class Board:
 						rv[IX_EV] += evtable[b5]
 						#if verbose: print("b5 = 0x%x, ev = %d" % [b5, ev])
 						var is34 = is34table[b5]
-						if is34 == FOUR: rv[IX_B4] += 1
+						if is34 == FOUR:
+							rv[IX_B4] += 1
+							black >>= 4
+							white >>= 4
 						#elif is34 == THREE: rv[IX_B3] += 1
 						else:
-							if (b5 == 0b01110 ||
+							if ((!(black&0b100000) && b5 == 0b01110 && !is_rt_black) ||
 								((b5 == 0b11010 || b5 == 0b10110) && !(not_zero&0b100000)) ||
-								((b5 == 0b01101 || b5 == 0b01011) && is_lsb_zero)):
+								((b5 == 0b01101 || b5 == 0b01011) && !is_rt_black && !is_rt_white)):
 									rv[IX_B3] += 1
+									black >>= 3
+									white >>= 3
 					else:
 						pass	# 黒白両方ある場合は、評価値: 0
 				else:
 					if w5 != 0:
 						rv[IX_EV] -= evtable[w5]
 						var is34 = is34table[w5]
-						if is34 == FOUR: rv[IX_W4] += 1
+						if is34 == FOUR:
+							rv[IX_W4] += 1
+							black >>= 4
+							white >>= 4
 						#elif is34 == THREE: rv[IX_W3] += 1
 						else:
-							if (w5 == 0b01110 ||
+							if ((!(white&0b100000) && w5 == 0b01110 && !is_rt_white) ||
 								((w5 == 0b11010 || w5 == 0b10110) && !(not_zero&0b100000)) ||
-								((w5 == 0b01101 || w5 == 0b01011) && is_lsb_zero)):
+								((w5 == 0b01101 || w5 == 0b01011) && !is_rt_black && !is_rt_white)):
 									rv[IX_W3] += 1
+									black >>= 3
+									white >>= 3
 					else:
 						pass	# 黒白両方空欄のみの場合は、評価値: 0
-				is_lsb_zero = ((black|white)&1) == 0
+				#is_rt_zero = ((black|white)&1) == 0
+				is_rt_black = (black&1) != 0
+				is_rt_white = (white&1) != 0
 				not_zero >>= 1
 				black >>= 1
 				white >>= 1
@@ -912,7 +927,7 @@ class Board:
 		assert( rv[IX_W3] == 0 )
 		assert( rv[IX_W4] == 0 )
 		rv = eval_bitmap_34(0b00110100, 0, 8)
-		assert( rv[IX_B3] == 2 )
+		assert( rv[IX_B3] == 1 )
 		assert( rv[IX_B4] == 0 )
 		assert( rv[IX_W3] == 0 )
 		assert( rv[IX_W4] == 0 )
@@ -929,24 +944,34 @@ class Board:
 		rv = eval_bitmap_34(0, 0b00110100, 8)
 		assert( rv[IX_B3] == 0 )
 		assert( rv[IX_B4] == 0 )
-		assert( rv[IX_W3] == 2 )
+		assert( rv[IX_W3] == 1 )
 		assert( rv[IX_W4] == 0 )
 		rv = eval_bitmap_34(0b011110, 0, 6)
 		assert( rv[IX_B3] == 0 )
-		assert( rv[IX_B4] == 2 )
+		assert( rv[IX_B4] == 1 )
 		assert( rv[IX_W3] == 0 )
 		assert( rv[IX_W4] == 0 )
 		rv = eval_bitmap_34(0, 0b011110, 6)
 		assert( rv[IX_B3] == 0 )
 		assert( rv[IX_B4] == 0 )
 		assert( rv[IX_W3] == 0 )
-		assert( rv[IX_W4] == 2 )
+		assert( rv[IX_W4] == 1 )
 		rv = eval_bitmap_34(0b111000, 0, 6)
 		assert( rv[IX_B3] == 0 )
 		rv = eval_bitmap_34(0b000111, 0, 6)
 		assert( rv[IX_B3] == 0 )
 		rv = eval_bitmap_34(0b011100, 0, 6)
 		assert( rv[IX_B3] == 1 )
+		rv = eval_bitmap_34(0b101110, 0, 6)
+		assert( rv[IX_B3] == 0 )
+		assert( rv[IX_B4] == 1 )
+		assert( rv[IX_W3] == 0 )
+		assert( rv[IX_W4] == 0 )
+		rv = eval_bitmap_34(0, 0b101110, 6)
+		assert( rv[IX_B3] == 0 )
+		assert( rv[IX_B4] == 0 )
+		assert( rv[IX_W3] == 0 )
+		assert( rv[IX_W4] == 1 )
 	func check_hv_bitmap() -> bool:
 		for y in range(N_VERT):
 			for x in range(N_HORZ):

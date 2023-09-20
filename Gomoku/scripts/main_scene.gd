@@ -537,6 +537,28 @@ func unit_test():
 	assert( b2.n_white_three == 0 )
 	assert( b2.n_black_four == 1 )
 	assert( b2.n_white_four == 0 )
+	b2.clear()
+	b2.put_color(3, 3, g.BLACK)
+	b2.put_color(4, 4, g.BLACK)
+	b2.put_color(5, 5, g.BLACK)
+	b2.put_color(7, 7, g.BLACK)			# ｜・・・●●●・●・・…
+	assert( b2.n_black_three == 0 )
+	assert( b2.n_white_three == 0 )
+	assert( b2.n_black_four == 1 )
+	assert( b2.n_white_four == 0 )
+	b2.clear()
+	b2.put_color(3, 3, g.BLACK)
+	b2.put_color(5, 5, g.BLACK)
+	b2.put_color(6, 6, g.BLACK)			# ｜・・・●・●●・・…
+	assert( b2.n_black_three == 1 )
+	assert( b2.n_white_three == 0 )
+	assert( b2.n_black_four == 0 )
+	assert( b2.n_white_four == 0 )
+	b2.put_color(7, 7, g.BLACK)			# ｜・・・●・●●●・・…
+	assert( b2.n_black_three == 0 )
+	assert( b2.n_white_three == 0 )
+	assert( b2.n_black_four == 1 )
+	assert( b2.n_white_four == 0 )
 	# 評価関数差分計算
 	b2.clear()
 	assert( b2.eval == 0 )
@@ -593,17 +615,32 @@ func unit_test():
 	print("n_black_four = ", b2.n_black_four)
 	print("n_white_four = ", b2.n_white_four)
 	assert( b2.calc_eval_diff(g.BLACK) > 0 )		# 次の手番の黒に三が出来ている
+	## 黒五だ出来た時点で終局なので、このような状況はありあえない
+	##b2.clear()
+	##b2.put_color(0, 0, g.BLACK)
+	##b2.put_color(1, 0, g.BLACK)
+	##b2.put_color(2, 0, g.BLACK)
+	##b2.put_color(3, 0, g.BLACK)
+	##b2.put_color(4, 0, g.BLACK)		# 黒：五が出来ている
+	##b2.put_color(0, 1, g.WHITE)
+	##b2.put_color(1, 1, g.WHITE)
+	##b2.put_color(2, 1, g.WHITE)
+	##b2.put_color(3, 1, g.WHITE)		# 白：活きている四
+	#  ●●●●●
+	#  ◯◯◯◯
+	##assert( b2.calc_eval_diff(g.WHITE) > 1000 )		# 黒五が出来ている
 	b2.clear()
-	b2.put_color(0, 0, g.BLACK)
-	b2.put_color(1, 0, g.BLACK)
 	b2.put_color(2, 0, g.BLACK)
 	b2.put_color(3, 0, g.BLACK)
-	b2.put_color(4, 0, g.BLACK)		# 黒：五が出来ている
-	b2.put_color(0, 1, g.WHITE)
-	b2.put_color(1, 1, g.WHITE)
-	b2.put_color(2, 1, g.WHITE)
-	b2.put_color(3, 1, g.WHITE)		# 白：活きている四
-	assert( b2.calc_eval_diff(g.WHITE) > 1000 )		# 次の手番の黒に三が出来ている
+	b2.put_color(4, 0, g.BLACK)
+	b2.put_color(5, 0, g.BLACK)
+	print("eval = ", b2.eval)
+	var e4 = b2.calc_eval_diff(g.WHITE)
+	b2.remove_color(5, 0)
+	b2.put_color(6, 0, g.BLACK)
+	print("eval = ", b2.eval)
+	var e3_1 = b2.calc_eval_diff(g.WHITE)
+	assert( e4 > e3_1 )
 	#
 	b2.clear()
 	b2.put_color(6, 3, g.BLACK)
