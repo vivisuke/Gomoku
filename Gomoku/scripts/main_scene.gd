@@ -27,6 +27,7 @@ var game_started = false		# ゲーム中か？
 var game_over = false			# 勝敗がついたか？
 var won_color = g.EMPTY			# 勝者
 var next_color = g.BLACK		# 次の手番
+var n_empty = N_HORZ*N_VERT		# 空欄数
 var white_player = HUMAN
 var black_player = HUMAN
 var pressedPos = Vector2i(0, 0)
@@ -77,9 +78,9 @@ func update_view():
 		for x in range(N_HORZ):
 			var c:int = bd.get_color(x, y)
 			$Board/TileMap.set_cell(0, Vector2(x, y), c-1, Vector2i(0, 0))
-	if bd.n_space == 0:
-		on_gameover(g.EMPTY)
-		return
+	#if bd.n_space == 0:
+	#	on_gameover(g.EMPTY)
+	#	return
 	update_next_underline()
 	# prev_put_pos の強調を消し、put_pos を強調
 	#if prev_put_pos.x >= 0:
@@ -91,10 +92,13 @@ func update_view():
 	else:
 		$Board/PutCursor.position = Vector2(-10, -10)*CELL_WD
 	#
-	if won_color != g.EMPTY:
-		$MessLabel.text = ("BLACK" if won_color == g.BLACK else "WHITE") + " won"
-	elif bd.n_space == 0:
-		$MessLabel.text = "draw"
+	if game_over:
+		if won_color != g.EMPTY:
+			$MessLabel.text = ("BLACK" if won_color == g.BLACK else "WHITE") + " won"
+		else:
+			$MessLabel.text = "draw"
+	#elif bd.n_space == 0:
+	#	$MessLabel.text = "draw"
 	elif !game_started:
 		$MessLabel.text = "push [Start Game]"
 	else:
@@ -302,7 +306,11 @@ func do_put(x, y):
 	#prev_put_pos = put_pos
 	put_pos = pos
 	if fv: on_gameover(next_color)
-	next_color = (g.BLACK + g.WHITE) - next_color
+	n_empty -= 1
+	if n_empty == 0:
+		on_gameover(g.EMPTY)
+	else:
+		next_color = (g.BLACK + g.WHITE) - next_color
 	update_view()
 	#bd.print_eval(next_color)
 func on_gameover(wcol):
@@ -726,8 +734,10 @@ func unit_test():
 func _on_init_button_pressed():
 	if game_started: return
 	bd.clear()
+	game_over = false
 	next_color = g.BLACK
 	won_color = g.EMPTY
+	n_empty = N_HORZ*N_VERT
 	move_hist.clear()
 	move_ix = -1
 	bd.put_order_ix = -1
@@ -885,6 +895,8 @@ func _on_back_button_pressed():
 		else:
 			put_pos = Vector2i(-10, -10)
 		next_color = (g.BLACK + g.WHITE) - next_color
+		game_over = false
+		$StartStopButton.disabled = false
 		update_view()
 func _on_forward_button_pressed():
 	if move_ix + 1 < move_hist.size():
@@ -905,6 +917,8 @@ func _on_first_button_pressed():
 		bd.remove_color(p.x, p.y)
 	next_color = g.BLACK
 	put_pos = Vector2i(-10, -10)
+	game_over = false
+	$StartStopButton.disabled = false
 	update_view()
 func _on_last_button_pressed():
 	while move_ix + 1 < move_hist.size():
