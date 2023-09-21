@@ -473,7 +473,9 @@ class Board:
 		n_calc_eval += 1
 		if next_color == BLACK:
 			if n_black_four != 0:		# 四が出来ている
-				return eval + 2000
+				return 9000
+			if n_white_four2 != 0:		# 白に両四が出来ている
+				return -9000
 			if n_white_four != 0:		# 白に四が出来ている
 				if n_white_three != 0:
 					return eval - 2000	# 白に四三が出来ている
@@ -483,7 +485,9 @@ class Board:
 				return eval + 50
 		else:
 			if n_white_four != 0:		# 四が出来ている
-				return eval - 2000
+				return -9000
+			if n_black_four2 != 0:			# 黒に両四が出来ている
+				return 9000
 			if n_black_four != 0:		# 黒に四が出来ている
 				if n_black_three != 0:
 					return eval + 2000	# 黒に四三が出来ている
@@ -811,6 +815,9 @@ class Board:
 				if is_empty(x, y):
 					put_color(x, y, next_color)
 					if is_legal_put(x, y, next_color):
+						if is_five(x, y, next_color):
+							remove_color(x, y)
+							return 9000
 						var ev = alpha_beta(WHITE, alpha, beta, depth-1)
 						remove_color(x, y)
 						if ev > alpha:
@@ -826,6 +833,9 @@ class Board:
 				var y = prio_pos[i][1]
 				if is_empty(x, y):
 					put_color(x, y, next_color)
+					if is_five(x, y, next_color):
+						remove_color(x, y)
+						return -9000
 					var ev = alpha_beta(BLACK, alpha, beta, depth-1)
 					remove_color(x, y)
 					if ev < beta:
@@ -919,6 +929,7 @@ class Board:
 				else: txt += " ."
 				mask >>= 1
 			print(txt)
+		print("\n")
 	func print_eval(next_color):
 		for y in range(N_VERT):
 			var txt = ""
@@ -932,6 +943,7 @@ class Board:
 					remove_color(x, y)
 				mask >>= 1
 			print(txt)
+		print("\n")
 	func print_eval_ndiff(next_color):
 		for y in range(N_VERT):
 			var txt = ""
@@ -949,6 +961,7 @@ class Board:
 					remove_color(x, y)
 				mask >>= 1
 			print(txt)
+		print("\n")
 	func unit_test():
 		assert( prio_pos.size() == N_HORZ * N_VERT )
 		#
@@ -1033,6 +1046,19 @@ class Board:
 		assert( rv[IX_B4] == 0 )
 		assert( rv[IX_W3] == 0 )
 		assert( rv[IX_W4] == 1 )
+		# 対称性チェック
+		rv = eval_bitmap_34(0b011010, 0, 6)
+		var ev0 = rv[IX_EV]
+		assert( rv[IX_B3] == 1 )
+		assert( rv[IX_B4] == 0 )
+		assert( rv[IX_W3] == 0 )
+		assert( rv[IX_W4] == 0 )
+		rv = eval_bitmap_34(0b010110, 0, 6)
+		assert( rv[IX_EV] == ev0 )
+		assert( rv[IX_B3] == 1 )
+		assert( rv[IX_B4] == 0 )
+		assert( rv[IX_W3] == 0 )
+		assert( rv[IX_W4] == 0 )
 	func check_hv_bitmap() -> bool:
 		for y in range(N_VERT):
 			for x in range(N_HORZ):
