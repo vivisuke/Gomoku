@@ -7,6 +7,8 @@ const ID_GRAY = 0
 const ID_BG = 2
 const CELL_WD = 42
 
+const N_FWD_PRUNING_NODE = 20
+
 var N_HORZ = g.N_HORZ
 var N_VERT = g.N_VERT
 var N_CELLS = N_HORZ*N_VERT
@@ -141,7 +143,8 @@ func _process(delta):
 		#var op = bd.do_alpha_beta_search(next_color, depth)
 		#do_put(op.x, op.y)
 		#AI_thinking = false
-	if bd.put_order_ix >= 0 && bd.put_order_ix < bd.put_order.size():
+	var nfp = min(N_FWD_PRUNING_NODE, bd.put_order.size())
+	if bd.put_order_ix >= 0 && bd.put_order_ix < nfp:
 		# アルファベータ法によるAI着手決定
 		# 着手順は事前に決定され bd.put_order[] に格納されている（要素：[ev, x, y]）
 		var x = bd.put_order[bd.put_order_ix][g.IX_X]
@@ -172,7 +175,7 @@ func _process(delta):
 				print("eval(%2d, %2d) = %4d" % [x, y, ev])
 				print_count -= 1
 			bd.put_order_ix += 1
-		if bd.put_order_ix < bd.put_order.size():
+		if bd.put_order_ix < nfp:
 			#x = bd.put_order[bd.put_order_ix][g.IX_X]
 			#y = bd.put_order[bd.put_order_ix][g.IX_Y]
 			#$Board/SearchCursor.position = Vector2(x, y) * CELL_WD
