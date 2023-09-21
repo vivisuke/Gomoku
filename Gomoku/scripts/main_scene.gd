@@ -311,6 +311,7 @@ func on_gameover(wcol):
 	$StartStopButton.set_pressed_no_signal(false)
 	$StartStopButton.text = "Start Game"
 	$StartStopButton.icon = $StartStopButton/PlayTexture.texture
+	$StartStopButton.disabled = true
 	#var c = "BLACK" if next_color == g.WHITE else "WHITE"
 	#$MessLabel.text = c + " won."
 	#won_color = g.BLACK if next_color == g.WHITE else g.WHITE
@@ -731,6 +732,7 @@ func _on_init_button_pressed():
 	move_ix = -1
 	bd.put_order_ix = -1
 	AI_thinking = false
+	$StartStopButton.disabled = false
 	$HBC/UndoButton.disabled = true
 	put_pos = Vector2i(-10, -10)
 	#if put_pos != Vector2i(-1, -1):
