@@ -161,11 +161,13 @@ func _process(delta):
 					alpha = ev
 					best_pos = [x, y]
 					$Board/SearchCursor.position = Vector2(x, y) * CELL_WD
+					print("put_order_ix = ", bd.put_order_ix)
 			else:
 				if ev < beta:
 					beta = ev
 					best_pos = [x, y]
 					$Board/SearchCursor.position = Vector2(x, y) * CELL_WD
+					print("put_order_ix = ", bd.put_order_ix)
 			if print_count > 0:
 				print("eval(%2d, %2d) = %4d" % [x, y, ev])
 				print_count -= 1
