@@ -133,9 +133,9 @@ func _process(delta):
 		bd.build_put_order(next_color)
 		alpha = g.ALPHA
 		beta = g.BETA
-		var x = bd.put_order[bd.put_order_ix][g.IX_X]
-		var y = bd.put_order[bd.put_order_ix][g.IX_Y]
-		$Board/SearchCursor.position = Vector2(x, y) * CELL_WD		# 先読み箇所強調
+		#var x = bd.put_order[bd.put_order_ix][g.IX_X]
+		#var y = bd.put_order[bd.put_order_ix][g.IX_Y]
+		#$Board/SearchCursor.position = Vector2(x, y) * CELL_WD		# 先読み箇所強調
 		print_count = 10			# 上位10箇所の評価値プリント
 		#var depth = (black_player if next_color == g.BLACK else white_player) - AI_DEPTH_0
 		#var op = bd.do_alpha_beta_search(next_color, depth)
@@ -160,18 +160,21 @@ func _process(delta):
 				if ev > alpha:
 					alpha = ev
 					best_pos = [x, y]
+					$Board/SearchCursor.position = Vector2(x, y) * CELL_WD
 			else:
 				if ev < beta:
 					beta = ev
 					best_pos = [x, y]
+					$Board/SearchCursor.position = Vector2(x, y) * CELL_WD
 			if print_count > 0:
 				print("eval(%2d, %2d) = %4d" % [x, y, ev])
 				print_count -= 1
 			bd.put_order_ix += 1
 		if bd.put_order_ix < bd.put_order.size():
-			x = bd.put_order[bd.put_order_ix][g.IX_X]
-			y = bd.put_order[bd.put_order_ix][g.IX_Y]
-			$Board/SearchCursor.position = Vector2(x, y) * CELL_WD
+			#x = bd.put_order[bd.put_order_ix][g.IX_X]
+			#y = bd.put_order[bd.put_order_ix][g.IX_Y]
+			#$Board/SearchCursor.position = Vector2(x, y) * CELL_WD
+			pass
 		else:
 			print("best_pos = ", best_pos)
 			do_put(best_pos[0], best_pos[1])
@@ -415,24 +418,24 @@ func unit_test():
 	b2.put_color(4, 2, g.BLACK)
 	b2.put_color(5, 3, g.BLACK)
 	b2.put_color(6, 4, g.WHITE)
-	b2.calc_eval(g.WHITE)
-	print("calc_eval(): ", b2.eval)
+	b2.calc_eval_diff(g.WHITE)
+	print("calc_eval_diff(): ", b2.eval)
 	#var t = b2.eval_bitmap(b2.d_black[8], b2.d_white[8], 9, g.WHITE)
 	#print("eval_bitmap(): ", t)
 	#
-	b2.verbose = true
-	var ev1101 = b2.eval_bitmap(0b00011010000, 0, 11, g.BLACK)
-	var ev1011 = b2.eval_bitmap(0b00001011000, 0, 11, g.BLACK)
-	b2.verbose = false
-	assert( ev1101 == ev1011 )
+	##b2.verbose = true
+	##var ev1101 = b2.eval_bitmap(0b00011010000, 0, 11, g.BLACK)
+	##var ev1011 = b2.eval_bitmap(0b00001011000, 0, 11, g.BLACK)
+	##b2.verbose = false
+	##assert( ev1101 == ev1011 )
 	#var ev1011 = b2.eval_bitmap(0b000000110, 0, 11, g.BLACK)
 	#
 	b2.clear()
-	b2.calc_eval(g.BLACK)
+	b2.calc_eval_diff(g.BLACK)
 	assert(b2.eval == 0)
 	b2.put_color(0, 0, g.BLACK)
 	assert(b2.d_black[6] == 0b10000000000)
-	b2.calc_eval(g.WHITE)
+	b2.calc_eval_diff(g.WHITE)
 	print(b2.eval)
 	assert(b2.eval == 3)
 	# 合法手チェック
@@ -494,10 +497,10 @@ func unit_test():
 	b2.put_color(0, 10, g.WHITE)
 	b2.put_color(10, 10, g.WHITE)
 	b2.put_color(5, 3, g.BLACK)
-	var evu = b2.calc_eval(g.BLACK)
+	var evu = b2.calc_eval_diff(g.BLACK)
 	b2.remove_color(5, 3)
 	b2.put_color(5, 7, g.BLACK)
-	var evd = b2.calc_eval(g.BLACK)
+	var evd = b2.calc_eval_diff(g.BLACK)
 	b2.remove_color(5, 7)
 	assert( evu == evd )
 	# 黒白三・四数チェック
@@ -645,6 +648,16 @@ func unit_test():
 	print("eval = ", b2.eval)
 	var e3_1 = b2.calc_eval_diff(g.WHITE)
 	assert( e4 > e3_1 )
+	b2.clear()
+	b2.put_color(4, 6, g.BLACK)
+	b2.put_color(5, 6, g.BLACK)
+	b2.put_color(6, 6, g.BLACK)
+	b2.put_color(7, 6, g.BLACK)		# 黒：両端空四
+	b2.put_color(4, 4, g.WHITE)
+	b2.put_color(5, 4, g.WHITE)
+	b2.put_color(6, 4, g.WHITE)		# 白：両端空三
+	var e4_3 = b2.calc_eval_diff(g.WHITE)
+	assert( e4_3 > 9000 )
 	#
 	b2.clear()
 	b2.put_color(6, 3, g.BLACK)
@@ -740,7 +753,7 @@ func print_eval():
 			if bd.is_empty(x, y):
 				bd.put_color(x, y, next_color)
 				if bd.is_legal_put(x, y, next_color):
-					bd.calc_eval(next_color)
+					bd.calc_eval_diff(next_color)
 					eval_labels[ix].text = "%d" % bd.eval
 					#if (x == 5 && y == 3) || (x == 5 && y == 8):
 					#	var txt = "(%d, %d):\n" % [x, y]
@@ -786,7 +799,7 @@ func build_put_order():
 		if bd.is_empty(x, y):
 			bd.put_color(x, y, next_color)
 			if bd.is_legal_put(x, y, next_color):
-				bd.calc_eval(next_color)
+				bd.calc_eval_diff(next_color)
 				put_order.push_back([bd.eval, x, y])
 			bd.remove_color(x, y)
 	#print(put_order, "\n")

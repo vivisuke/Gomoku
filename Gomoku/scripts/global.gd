@@ -84,15 +84,19 @@ class Board:
 	const IX_W3 = 2
 	const IX_B4 = 3
 	const IX_W4 = 4
+	const IX_B42 = 5		# 両端空四個数インデックス
+	const IX_W42 = 6		# 両端空四個数インデックス
 	#var nput
 	var verbose = false
 	var n_space				# 空欄数
 	var n_calc_eval = 0		# 評価ノード数
 	var eval = 0			# 評価値
 	var n_black_three		# 黒三個数
-	var n_black_four		# 黒四個数
 	var n_white_three		# 白三個数
+	var n_black_four		# 黒四個数
 	var n_white_four		# 白四個数
+	var n_black_four2		# 黒両端空四個数
+	var n_white_four2		# 白両端空四個数
 	var h_black = []		# 水平方向ビットマップ
 	var h_white = []		# 水平方向ビットマップ
 	var v_black = []		# 垂直方向ビットマップ
@@ -105,18 +109,26 @@ class Board:
 	var h_w_three = []		# 各水平方向ラインの白 三 の数
 	var h_b_four = []		# 各水平方向ラインの黒 四 の数
 	var h_w_four = []		# 各水平方向ラインの白 四 の数
+	var h_b_four2 = []		# 各水平方向ラインの黒 両端空四 の数
+	var h_w_four2 = []		# 各水平方向ラインの白 両端空四 の数
 	var v_b_three = []		# 各垂直方向ラインの黒 三 の数
 	var v_w_three = []		# 各垂直方向ラインの白 三 の数
 	var v_b_four = []		# 各垂直方向ラインの黒 四 の数
 	var v_w_four = []		# 各垂直方向ラインの白 四 の数
+	var v_b_four2 = []		# 各垂直方向ラインの黒 両端空四 の数
+	var v_w_four2 = []		# 各垂直方向ラインの白 両端空四 の数
 	var u_b_three = []		# 各右上方向ラインの黒 三 の数
 	var u_w_three = []		# 各右上方向ラインの白 三 の数
 	var u_b_four = []		# 各右上方向ラインの黒 四 の数
 	var u_w_four = []		# 各右上方向ラインの白 四 の数
+	var u_b_four2 = []		# 各右上方向ラインの黒 両端空四 の数
+	var u_w_four2 = []		# 各右上方向ラインの白 両端空四 の数
 	var d_b_three = []		# 各右下方向ラインの黒 三 の数
 	var d_w_three = []		# 各右下方向ラインの白 三 の数
 	var d_b_four = []		# 各右下方向ラインの黒 四 の数
 	var d_w_four = []		# 各右下方向ラインの白 四 の数
+	var d_b_four2 = []		# 各右下方向ラインの黒 両端空四 の数
+	var d_w_four2 = []		# 各右下方向ラインの白 両端空四 の数
 	var h_eval = []			# 水平方向評価値（黒から見た値）
 	var v_eval = []			# 垂直方向評価値
 	var u_eval = []			# 右上方向評価値
@@ -352,39 +364,38 @@ class Board:
 		return is34table[b5] != NONE && w5 == 0
 		#return (b5 == 0b01110 || b5 == 0b01111 || b5 == 0b10111 ||
 		#		b5 == 0b11011 || b5 == 0b11101 || b5 == 0b11110)
-	func eval_bitmap(black, white, nbit, nxcol):		# bitmap（下位 nbit）を評価
-		if black == 0 && white == 0: return 0
-		if verbose: print("black = 0x%x" % black)
-		var ev = 0
-		for i in range(nbit - 4):
-			var b5 = black & 0x1f
-			var w5 = white & 0x1f
-			if b5 != 0:
-				if w5 == 0:
-					ev += evtable[b5]
-					if nxcol == BLACK && is_forced(b5, w5):
-						ev += evtable[b5] * 2
-					if verbose: print("b5 = 0x%x, ev = %d" % [b5, ev])
-				else:
-					pass	# 黒白両方ある場合は、評価値: 0
-			else:
-				if w5 != 0:
-					ev -= evtable[w5]
-					if nxcol == WHITE && is_forced(w5, b5):
-						ev -= evtable[w5] * 2
-				else:
-					pass	# 黒白両方空欄のみの場合は、評価値: 0
-			black >>= 1
-			white >>= 1
-		return ev
-	# bitmap（下位 nbit）を評価、三・四の個数を数える
-	# return: [eval, b3, w3, b4, w4]
-	func eval_bitmap_34(black, white, nbit):
-		var rv = [0, 0, 0, 0, 0]
+	##func eval_bitmap(black, white, nbit, nxcol):		# bitmap（下位 nbit）を評価
+	##	if black == 0 && white == 0: return 0
+	##	if verbose: print("black = 0x%x" % black)
+	##	var ev = 0
+	##	for i in range(nbit - 4):
+	##		var b5 = black & 0x1f
+	##		var w5 = white & 0x1f
+	##		if b5 != 0:
+	##			if w5 == 0:
+	##				ev += evtable[b5]
+	##				if nxcol == BLACK && is_forced(b5, w5):
+	##					ev += evtable[b5] * 2
+	##				if verbose: print("b5 = 0x%x, ev = %d" % [b5, ev])
+	##			else:
+	##				pass	# 黒白両方ある場合は、評価値: 0
+	##		else:
+	##			if w5 != 0:
+	##				ev -= evtable[w5]
+	##				if nxcol == WHITE && is_forced(w5, b5):
+	##					ev -= evtable[w5] * 2
+	##			else:
+	##				pass	# 黒白両方空欄のみの場合は、評価値: 0
+	##		black >>= 1
+	##		white >>= 1
+	##	return ev
+	# bitmap（下位 nbit）を評価、さらに 三・四の個数を数える
+	func eval_bitmap_34(black, white, nbit) -> Array:		# return: [eval, b3, w3, b4, w4, b42, w42]
+		var rv = [0, 0, 0, 0, 0, 0, 0]
 		if black != 0 || white != 0:
 			var not_zero = black | white | (1<<nbit)
 			#var is_lt_black = black & (1<<nbit)
-			#var is_rt_zero : bool = false
+			var is_rt_zero : bool = false
 			var is_rt_black : bool = false
 			var is_rt_white : bool = false
 			for i in range(nbit - 4):
@@ -397,6 +408,10 @@ class Board:
 						var is34 = is34table[b5]
 						if is34 == FOUR:
 							rv[IX_B4] += 1
+							#var ltz = (not_zero&0b100000)==0
+							#var b = b5 == 0b11110
+							if (b5 == 0b01111 && is_rt_zero) || (b5 == 0b11110 && (not_zero&0b100000)==0):
+								rv[IX_B42] += 1
 							black >>= 4
 							white >>= 4
 						#elif is34 == THREE: rv[IX_B3] += 1
@@ -415,6 +430,8 @@ class Board:
 						var is34 = is34table[w5]
 						if is34 == FOUR:
 							rv[IX_W4] += 1
+							if (w5 == 0b01111 && is_rt_zero) || (w5 == 0b11110 && (not_zero&0b100000)==0):
+								rv[IX_W42] += 1
 							black >>= 4
 							white >>= 4
 						#elif is34 == THREE: rv[IX_W3] += 1
@@ -427,7 +444,7 @@ class Board:
 									white >>= 3
 					else:
 						pass	# 黒白両方空欄のみの場合は、評価値: 0
-				#is_rt_zero = ((black|white)&1) == 0
+				is_rt_zero = ((black|white)&1) == 0
 				is_rt_black = (black&1) != 0
 				is_rt_white = (white&1) != 0
 				not_zero >>= 1
@@ -457,23 +474,23 @@ class Board:
 			if n_white_three != 0:
 				return eval - 50
 		return eval
-	func calc_eval(next_color):			# 評価関数計算、非差分計算
-		eval = 0
-		for y in range(N_VERT):
-			h_eval[y] = eval_bitmap(h_black[y], h_white[y], N_HORZ, next_color)
-			eval += h_eval[y]
-		for x in range(N_HORZ):
-			v_eval[x] = eval_bitmap(v_black[x], v_white[x], N_VERT, next_color)
-			eval += v_eval[x]
-		var len = 5
-		var d = 1
-		for i in range(N_DIAGONAL):
-			u_eval[i] = eval_bitmap(u_black[i], u_white[i], len, next_color)
-			eval += u_eval[i]
-			d_eval[i] = eval_bitmap(d_black[i], d_white[i], len, next_color)
-			eval += d_eval[i]
-			len += d
-			if len == 11: d = -1
+	##func calc_eval(next_color):			# 評価関数計算、非差分計算
+	##	eval = 0
+	##	for y in range(N_VERT):
+	##		h_eval[y] = eval_bitmap(h_black[y], h_white[y], N_HORZ, next_color)
+	##		eval += h_eval[y]
+	##	for x in range(N_HORZ):
+	##		v_eval[x] = eval_bitmap(v_black[x], v_white[x], N_VERT, next_color)
+	##		eval += v_eval[x]
+	##	var len = 5
+	##	var d = 1
+	##	for i in range(N_DIAGONAL):
+	##		u_eval[i] = eval_bitmap(u_black[i], u_white[i], len, next_color)
+	##		eval += u_eval[i]
+	##		d_eval[i] = eval_bitmap(d_black[i], d_white[i], len, next_color)
+	##		eval += d_eval[i]
+	##		len += d
+	##		if len == 11: d = -1
 	# (x, y) に着手した場合の評価値差分評価
 	func eval_putxy(x, y, next_color):
 		eval -= h_eval[y]
@@ -687,7 +704,7 @@ class Board:
 					if is_empty(x, y):
 						put_color(x, y, next_color)
 						if is_legal_put(x, y, next_color):
-							calc_eval(WHITE)
+							calc_eval_diff(WHITE)
 							if eval > mx:
 								mx = eval
 								#op = Vector2i(x, y)
@@ -701,7 +718,7 @@ class Board:
 				for x in range(N_HORZ):
 					if is_empty(x, y):
 						put_color(x, y, next_color)
-						calc_eval(BLACK)
+						calc_eval_diff(BLACK)
 						if eval < mn:
 							mn = eval
 							#op = Vector2i(x, y)
@@ -795,7 +812,7 @@ class Board:
 				if is_empty(x, y):
 					put_color(x, y, BLACK)
 					if is_legal_put(x, y, BLACK):
-						calc_eval(WHITE)
+						calc_eval_diff(WHITE)
 						ev_pos.push_back([eval, x, y])
 					remove_color(x, y)
 			ev_pos.sort_custom(func(lhs, rhs): return lhs[0] > rhs[0])
@@ -828,7 +845,7 @@ class Board:
 				var y = prio_pos[i][1]
 				if is_empty(x, y):
 					put_color(x, y, WHITE)
-					calc_eval(BLACK)
+					calc_eval_diff(BLACK)
 					ev_pos.push_back([eval, x, y])
 					remove_color(x, y)
 			ev_pos.sort_custom(func(lhs, rhs): return lhs[0] < rhs[0])
@@ -893,7 +910,7 @@ class Board:
 					if next_color == BLACK && !is_legal_put(x, y, BLACK):
 						txt += "  ---"
 					else:
-						calc_eval(next_color)
+						calc_eval_diff(next_color)
 						txt += ("%5d" % eval)
 					remove_color(x, y)
 				mask >>= 1
@@ -947,19 +964,25 @@ class Board:
 		assert( rv[IX_W4] == 0 )
 		rv = eval_bitmap_34(0, 0b00110100, 8)
 		assert( rv[IX_B3] == 0 )
-		assert( rv[IX_B4] == 0 )
 		assert( rv[IX_W3] == 1 )
+		assert( rv[IX_B4] == 0 )
 		assert( rv[IX_W4] == 0 )
+		assert( rv[IX_B42] == 0 )
+		assert( rv[IX_W42] == 0 )
 		rv = eval_bitmap_34(0b011110, 0, 6)
 		assert( rv[IX_B3] == 0 )
-		assert( rv[IX_B4] == 1 )
 		assert( rv[IX_W3] == 0 )
+		assert( rv[IX_B4] == 1 )
 		assert( rv[IX_W4] == 0 )
+		assert( rv[IX_B42] == 1 )
+		assert( rv[IX_W42] == 0 )
 		rv = eval_bitmap_34(0, 0b011110, 6)
 		assert( rv[IX_B3] == 0 )
-		assert( rv[IX_B4] == 0 )
 		assert( rv[IX_W3] == 0 )
+		assert( rv[IX_B4] == 0 )
 		assert( rv[IX_W4] == 1 )
+		assert( rv[IX_B42] == 0 )
+		assert( rv[IX_W42] == 1 )
 		rv = eval_bitmap_34(0b111000, 0, 6)
 		assert( rv[IX_B3] == 0 )
 		rv = eval_bitmap_34(0b000111, 0, 6)
