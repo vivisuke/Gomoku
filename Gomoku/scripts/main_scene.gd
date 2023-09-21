@@ -7,7 +7,7 @@ const ID_GRAY = 0
 const ID_BG = 2
 const CELL_WD = 42
 
-const N_FWD_PRUNING_NODE = 20
+const N_FWD_PRUNING_NODE = 30
 
 var N_HORZ = g.N_HORZ
 var N_VERT = g.N_VERT
@@ -123,8 +123,17 @@ func update_next_underline():
 	$BlackPlayer/Underline.visible = game_started && next_color == g.BLACK
 func _process(delta):
 	if( game_started && !AI_thinking &&
-			(next_color == g.WHITE && white_player >= AI_DEPTH_0 ||
-			next_color == g.BLACK && black_player >= AI_DEPTH_0) ):
+			(next_color == g.WHITE && white_player == AI_DEPTH_0 ||
+			next_color == g.BLACK && black_player == AI_DEPTH_0) ):
+		# AI の手番
+		AI_thinking = true
+		var mv = bd.sel_move_randomly(next_color)
+		do_put(mv.x, mv.y)
+		AI_thinking = false
+		return
+	if( game_started && !AI_thinking &&
+			(next_color == g.WHITE && white_player > AI_DEPTH_0 ||
+			next_color == g.BLACK && black_player > AI_DEPTH_0) ):
 		# AI の手番
 		AI_thinking = true
 		bd.n_calc_eval = 0
@@ -143,8 +152,14 @@ func _process(delta):
 		#var op = bd.do_alpha_beta_search(next_color, depth)
 		#do_put(op.x, op.y)
 		#AI_thinking = false
+		return
 	var nfp = min(N_FWD_PRUNING_NODE, bd.put_order.size())
 	if bd.put_order_ix >= 0 && bd.put_order_ix < nfp:
+		#var sx = ((bd.put_order_ix + 1)*10/nfp)*0.1
+		#if next_color == g.BLACK:
+		#	$BlackPlayer/Underline.scale.x = sx
+		#else:
+		#	$WhitePlayer/Underline.scale.x = sx
 		# アルファベータ法によるAI着手決定
 		# 着手順は事前に決定され bd.put_order[] に格納されている（要素：[ev, x, y]）
 		var x = bd.put_order[bd.put_order_ix][g.IX_X]
@@ -190,6 +205,7 @@ func _process(delta):
 			bd.put_order_ix = -1
 			AI_thinking = false
 			$Board/SearchCursor.position = Vector2(-10, -10)*CELL_WD
+		return
 	if calc_eval_pos >= 0:
 		var x = bd.prio_pos[calc_eval_pos][0]
 		var y = bd.prio_pos[calc_eval_pos][1]
@@ -209,6 +225,7 @@ func _process(delta):
 		if calc_eval_pos >= bd.prio_pos.size():
 			calc_eval_pos = -1
 			print("Time.msec = ", Time.get_ticks_msec())
+		return
 	if put_order_ix >= 0:		# アルファベータ法による評価値計算＆画面表示
 		var x = put_order[put_order_ix][g.IX_X]
 		var y = put_order[put_order_ix][g.IX_Y]
@@ -236,6 +253,7 @@ func _process(delta):
 			var end_msec = Time.get_ticks_msec()
 			print("Time.msec = ", end_msec)
 			print("dur = ", end_msec - start_msec)
+		return
 	pass
 func _input(event):
 	if !game_started: return

@@ -732,6 +732,40 @@ class Board:
 		elif u[0] >= 0 && is_three_sub(u[1], u_black[u[0]], u_white[u[0]], u[2]):
 			n3 += 1
 		return n4 < 2 && n3 < 2
+	func sel_move_randomly(next_color) -> Vector2i:
+		#var op = Vector2i(-1, -1)
+		var lst = []
+		if next_color == BLACK:		# 黒番
+			var mx = -99999
+			for y in range(N_VERT):
+				for x in range(N_HORZ):
+					if is_empty(x, y):
+						put_color(x, y, next_color)
+						if is_legal_put(x, y, next_color):
+							var ev = calc_eval_diff(WHITE) + randfn(0.0, 10)
+							if ev > mx:
+								mx = ev
+								lst = [Vector2i(x, y)]
+							elif ev == mx:
+								lst.push_back(Vector2i(x, y))
+						remove_color(x, y)
+		else:						# 白番
+			var mn = 99999
+			for y in range(N_VERT):
+				for x in range(N_HORZ):
+					if is_empty(x, y):
+						put_color(x, y, next_color)
+						var ev = calc_eval_diff(BLACK) + randfn(0.0, 10)
+						if ev < mn:
+							mn = ev
+							#op = Vector2i(x, y)
+							lst = [Vector2i(x, y)]
+						elif ev == mn:
+							lst.push_back(Vector2i(x, y))
+						remove_color(x, y)
+		if lst.size() == 1: return lst[0]
+		var r = randi() % lst.size()
+		return lst[r]
 	func put_minmax(next_color) -> Vector2i:
 		#var op = Vector2i(-1, -1)
 		var lst = []
