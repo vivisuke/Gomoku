@@ -158,18 +158,26 @@ class Board:
 		h_w_three.resize(N_VERT)
 		h_b_four.resize(N_VERT)
 		h_w_four.resize(N_VERT)
+		h_b_four2.resize(N_VERT)
+		h_w_four2.resize(N_VERT)
 		v_b_three.resize(N_VERT)
 		v_w_three.resize(N_VERT)
 		v_b_four.resize(N_VERT)
 		v_w_four.resize(N_VERT)
+		v_b_four2.resize(N_VERT)
+		v_w_four2.resize(N_VERT)
 		u_b_three.resize(N_DIAGONAL)
 		u_w_three.resize(N_DIAGONAL)
 		u_b_four.resize(N_DIAGONAL)
 		u_w_four.resize(N_DIAGONAL)
+		u_b_four2.resize(N_DIAGONAL)
+		u_w_four2.resize(N_DIAGONAL)
 		d_b_three.resize(N_DIAGONAL)
 		d_w_three.resize(N_DIAGONAL)
 		d_b_four.resize(N_DIAGONAL)
 		d_w_four.resize(N_DIAGONAL)
+		d_b_four2.resize(N_DIAGONAL)
+		d_w_four2.resize(N_DIAGONAL)
 		h_eval.resize(N_VERT)
 		v_eval.resize(N_HORZ)
 		u_eval.resize(N_DIAGONAL)
@@ -182,9 +190,11 @@ class Board:
 		n_space = N_HORZ * N_VERT
 		eval = 0
 		n_black_three = 0
-		n_black_four = 0
 		n_white_three = 0
+		n_black_four = 0
 		n_white_four = 0
+		n_black_four2 = 0
+		n_white_four2 = 0
 		h_black.fill(0)
 		h_white.fill(0)
 		v_black.fill(0)
@@ -197,18 +207,26 @@ class Board:
 		h_w_three.fill(0)
 		h_b_four.fill(0)
 		h_w_four.fill(0)
+		h_b_four2.fill(0)
+		h_w_four2.fill(0)
 		v_b_three.fill(0)
 		v_w_three.fill(0)
 		v_b_four.fill(0)
 		v_w_four.fill(0)
+		v_b_four2.fill(0)
+		v_w_four2.fill(0)
 		u_b_three.fill(0)
 		u_w_three.fill(0)
 		u_b_four.fill(0)
 		u_w_four.fill(0)
+		u_b_four2.fill(0)
+		u_w_four2.fill(0)
 		d_b_three.fill(0)
 		d_w_three.fill(0)
 		d_b_four.fill(0)
 		d_w_four.fill(0)
+		d_b_four2.fill(0)
+		d_w_four2.fill(0)
 		h_eval.fill(0)
 		v_eval.fill(0)
 		u_eval.fill(0)
@@ -505,6 +523,10 @@ class Board:
 		h_b_four[y] = rv[IX_B4]
 		n_white_four += rv[IX_W4] - h_w_four[y]
 		h_w_four[y] = rv[IX_W4]
+		n_black_four2 += rv[IX_B42] - h_b_four2[y]
+		h_b_four2[y] = rv[IX_B42]
+		n_white_four2 += rv[IX_W42] - h_w_four2[y]
+		h_w_four2[y] = rv[IX_W42]
 		#
 		eval -= v_eval[x]
 		rv= eval_bitmap_34(v_black[x], v_white[x], N_VERT)
@@ -518,6 +540,10 @@ class Board:
 		v_b_four[x] = rv[IX_B4]
 		n_white_four += rv[IX_W4] - v_w_four[x]
 		v_w_four[x] = rv[IX_W4]
+		n_black_four2 += rv[IX_B42] - v_b_four2[x]
+		v_b_four2[x] = rv[IX_B42]
+		n_white_four2 += rv[IX_W42] - v_w_four2[x]
+		v_w_four2[x] = rv[IX_W42]
 		#
 		var t = xyToUrIxMask(x, y)
 		var ix = t[0]
@@ -534,6 +560,10 @@ class Board:
 			u_b_four[ix] = rv[IX_B4]
 			n_white_four += rv[IX_W4] - u_w_four[ix]
 			u_w_four[ix] = rv[IX_W4]
+			n_black_four2 += rv[IX_B42] - u_b_four2[ix]
+			u_b_four2[ix] = rv[IX_B42]
+			n_white_four2 += rv[IX_W42] - u_w_four2[ix]
+			u_w_four2[ix] = rv[IX_W42]
 		t = xyToDrIxMask(x, y)
 		ix = t[0]
 		if ix >= 0:
@@ -549,6 +579,10 @@ class Board:
 			d_b_four[ix] = rv[IX_B4]
 			n_white_four += rv[IX_W4] - d_w_four[ix]
 			d_w_four[ix] = rv[IX_W4]
+			n_black_four2 += rv[IX_B42] - d_b_four2[ix]
+			d_b_four2[ix] = rv[IX_B42]
+			n_white_four2 += rv[IX_W42] - d_w_four2[ix]
+			d_w_four2[ix] = rv[IX_W42]
 		return eval
 	func is_five_sub(bitmap: int):		# 着手後、五目並んだか？
 		#var a = bitmap

@@ -157,7 +157,7 @@
 0152 ● C 09/21            │ToDo│eval_bitmap_34(black, white, nbit)：次手番に両端空四がある場合の評価値を ±9000 に
 0153 ◎ C 09/21 09/21 0.002│ToDo│calc_eval(), eval_bitmap() 削除？
 0154 ◎ C 09/21 09/21 0.002│ToDo│eval_bitmap_34()：両端空四個数もカウント
-0155 ● C 09/21            │ToDo│
+0155 ◎ C 09/21 09/21 0.002│ToDo│eval_putxy()：両端空四個数更新
 0156 ● C 09/21            │ToDo│
 0157 ● C 09/21            │ToDo│
 0158 ● C 09/21            │ToDo│
