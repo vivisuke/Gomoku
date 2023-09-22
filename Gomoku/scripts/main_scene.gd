@@ -33,6 +33,7 @@ var black_player = HUMAN
 var pressedPos = Vector2i(0, 0)
 var put_pos = Vector2i(-10, -10)	# -10 for 画面外
 #var prev_put_pos = Vector2(-1, -1)
+var confetti_count_down = 0.0	# 0.0より大きい：紙吹雪表示中
 var move_hist = []				# 着手履歴
 var move_ix = -1				# 着手済みIX
 var eval_labels = []
@@ -127,6 +128,10 @@ func update_next_underline():
 	$WhitePlayer/Underline.visible = game_started && next_color == g.WHITE
 	$BlackPlayer/Underline.visible = game_started && next_color == g.BLACK
 func _process(delta):
+	if confetti_count_down > 0.0:
+		confetti_count_down -= delta
+		if confetti_count_down <= 0.0:
+			$FakeConfettiParticles._set_emitting(false)
 	if( bd.n_space != 0 && game_started && !AI_thinking &&
 			(next_color == g.WHITE && white_player == AI_DEPTH_0 ||
 			next_color == g.BLACK && black_player == AI_DEPTH_0) ):
@@ -317,6 +322,10 @@ func do_put(x, y):
 func on_gameover(wcol):
 	game_started = false
 	game_over = true
+	if wcol == g.BLACK && black_player == HUMAN || wcol == g.WHITE && white_player == HUMAN:
+		confetti_count_down = 5.0
+		$FakeConfettiParticles._set_emitting(true)
+	#
 	$StartStopButton.set_pressed_no_signal(false)
 	$StartStopButton.text = "Start Game"
 	$StartStopButton.icon = $StartStopButton/PlayTexture.texture

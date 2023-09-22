@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://ditiwje3j3fsh"]
+[gd_scene load_steps=37 format=3 uid="uid://ditiwje3j3fsh"]
 
 [ext_resource type="Script" path="res://scripts/TitleBar.gd" id="1_3jkov"]
 [ext_resource type="Script" path="res://scripts/Board.gd" id="1_bcx5t"]
@@ -29,6 +29,7 @@
 [ext_resource type="Texture2D" uid="uid://bku51cmur5866" path="res://images/play_arrow_gray.png" id="21_buxqc"]
 [ext_resource type="Texture2D" uid="uid://1blb4mf5fkkn" path="res://images/skip_next_white.png" id="25_1egmy"]
 [ext_resource type="Texture2D" uid="uid://b8dlsb0rboj4v" path="res://images/skip_next_gray.png" id="26_yi1hs"]
+[ext_resource type="Script" path="res://scripts/FakeConfettiParticles.gd" id="30_tq7n4"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_b40eb"]
 texture = ExtResource("9_1b6l6")
@@ -404,6 +405,9 @@ offset_right = 106.0
 offset_bottom = 215.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "#empty: 121"
+
+[node name="FakeConfettiParticles" type="Node2D" parent="."]
+script = ExtResource("30_tq7n4")
 
 [connection signal="pressed" from="InitButton" to="." method="_on_init_button_pressed"]
 [connection signal="toggled" from="StartStopButton" to="." method="_on_start_stop_button_toggled"]
