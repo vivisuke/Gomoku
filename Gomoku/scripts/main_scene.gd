@@ -27,7 +27,7 @@ var game_started = false		# ゲーム中か？
 var game_over = false			# 勝敗がついたか？
 var won_color = g.EMPTY			# 勝者
 var next_color = g.BLACK		# 次の手番
-var n_empty = N_HORZ*N_VERT		# 空欄数
+#var n_empty = N_HORZ*N_VERT		# 空欄数
 var white_player = HUMAN
 var black_player = HUMAN
 var pressedPos = Vector2i(0, 0)
@@ -82,6 +82,7 @@ func update_view():
 	#	on_gameover(g.EMPTY)
 	#	return
 	update_next_underline()
+	$NEmptyLabel.text = "# empty: %d" % bd.n_space
 	# prev_put_pos の強調を消し、put_pos を強調
 	#if prev_put_pos.x >= 0:
 	#	#$Board/BGTileMap.set_cell(0, prev_put_pos, -1, Vector2i(0, 0))
@@ -126,7 +127,7 @@ func update_next_underline():
 	$WhitePlayer/Underline.visible = game_started && next_color == g.WHITE
 	$BlackPlayer/Underline.visible = game_started && next_color == g.BLACK
 func _process(delta):
-	if( game_started && !AI_thinking &&
+	if( bd.n_space != 0 && game_started && !AI_thinking &&
 			(next_color == g.WHITE && white_player == AI_DEPTH_0 ||
 			next_color == g.BLACK && black_player == AI_DEPTH_0) ):
 		# AI の手番
@@ -135,7 +136,7 @@ func _process(delta):
 		do_put(mv.x, mv.y)
 		AI_thinking = false
 		return
-	if( game_started && !AI_thinking &&
+	if( bd.n_space != 0 && game_started && !AI_thinking &&
 			(next_color == g.WHITE && white_player > AI_DEPTH_0 ||
 			next_color == g.BLACK && black_player > AI_DEPTH_0) ):
 		# AI の手番
@@ -306,8 +307,8 @@ func do_put(x, y):
 	#prev_put_pos = put_pos
 	put_pos = pos
 	if fv: on_gameover(next_color)
-	n_empty -= 1
-	if n_empty == 0:
+	#n_empty -= 1
+	if bd.n_space == 0:
 		on_gameover(g.EMPTY)
 	else:
 		next_color = (g.BLACK + g.WHITE) - next_color
@@ -737,7 +738,7 @@ func _on_init_button_pressed():
 	game_over = false
 	next_color = g.BLACK
 	won_color = g.EMPTY
-	n_empty = N_HORZ*N_VERT
+	#n_empty = N_HORZ*N_VERT
 	move_hist.clear()
 	move_ix = -1
 	bd.put_order_ix = -1

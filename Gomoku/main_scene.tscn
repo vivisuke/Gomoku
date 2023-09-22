@@ -397,6 +397,14 @@ theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "rule"
 horizontal_alignment = 1
 
+[node name="NEmptyLabel" type="Label" parent="."]
+offset_left = 10.0
+offset_top = 189.0
+offset_right = 106.0
+offset_bottom = 215.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "#empty: 121"
+
 [connection signal="pressed" from="InitButton" to="." method="_on_init_button_pressed"]
 [connection signal="toggled" from="StartStopButton" to="." method="_on_start_stop_button_toggled"]
 [connection signal="item_selected" from="BlackPlayer/OptionButton" to="." method="_on_black_player_selected"]
