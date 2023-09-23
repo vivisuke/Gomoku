@@ -238,17 +238,31 @@ tile_set = SubResource("TileSet_my21j")
 format = 2
 layer_0/tile_data = PackedInt32Array(131074, 0, 0)
 
-[node name="PutCursor" type="TextureRect" parent="Board"]
+[node name="PutCursor0" type="TextureRect" parent="Board"]
+visible = false
 layout_mode = 0
 offset_right = 42.0
 offset_bottom = 42.0
 texture = ExtResource("10_tqbab")
 
-[node name="SearchCursor" type="TextureRect" parent="Board"]
+[node name="PutCursor" type="ColorRect" parent="Board"]
+layout_mode = 0
+offset_right = 41.0
+offset_bottom = 41.0
+color = Color(0.501961, 0.752941, 0.501961, 1)
+
+[node name="SearchCursor0" type="TextureRect" parent="Board"]
+visible = false
 layout_mode = 0
 offset_right = 42.0
 offset_bottom = 42.0
 texture = ExtResource("11_1hf0g")
+
+[node name="SearchCursor" type="ColorRect" parent="Board"]
+layout_mode = 0
+offset_right = 41.0
+offset_bottom = 41.0
+color = Color(1, 0.501961, 0.501961, 1)
 
 [node name="Grid" type="ColorRect" parent="Board"]
 layout_mode = 0
