@@ -33,6 +33,7 @@ var black_player = HUMAN
 var pressedPos = Vector2i(0, 0)
 var put_pos = Vector2i(-10, -10)	# -10 for 画面外
 #var prev_put_pos = Vector2(-1, -1)
+var cur_pos = Vector2i(-1, -1)
 var confetti_count_down = 0.0	# 0.0より大きい：紙吹雪表示中
 var move_hist = []				# 着手履歴
 var move_ix = -1				# 着手済みIX
@@ -277,18 +278,28 @@ func _input(event):
 			#print("pressed")
 			pressedPos = pos
 		elif pos == pressedPos:
-			#print("released")
-			#if n_put == 0:
-			#	game_started = true
-			#	return
-			if pos.x < 0 || pos.x >= N_HORZ || pos.y < 0 || pos.y > N_VERT: return
+			if pos.x < 0 || pos.x >= N_HORZ || pos.y < 0 || pos.y >= N_VERT:
+				return		# 盤面外の場合
 			if !bd.is_empty(pos.x, pos.y): return
 			#print(pos)
-			do_put(pos.x, pos.y)
-			#bd.print_eval_ndiff(next_color)
-			put_order_ix = -1
-			calc_eval_pos = -1
+			if true:
+				cur_pos = pos
+				$Board/SearchCursor.position = pos*CELL_WD
+			else:
+				do_put(pos.x, pos.y)
+				#bd.print_eval_ndiff(next_color)
+				put_order_ix = -1
+				calc_eval_pos = -1
 	pass
+func _on_place_button_pressed():
+	if cur_pos.x >= 0:
+		do_put(cur_pos.x, cur_pos.y)
+		cur_pos = Vector2i(-1, -1)
+		$Board/SearchCursor.position = Vector2(-10, -10)*CELL_WD
+		put_order_ix = -1
+		calc_eval_pos = -1
+		
+	pass # Replace with function body.
 func do_put(x, y):
 	bd.put_color(x, y, next_color)
 	assert( bd.check_hv_bitmap() )
@@ -937,3 +948,5 @@ func _on_last_button_pressed():
 		bd.put_color(put_pos.x, put_pos.y, next_color)
 		next_color = (g.BLACK + g.WHITE) - next_color
 	update_view()
+
+
