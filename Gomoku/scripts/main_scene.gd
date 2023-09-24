@@ -335,6 +335,7 @@ func do_put(x, y):
 func on_gameover(wcol):
 	game_started = false
 	game_over = true
+	$HBC/UndoButton.disabled = true
 	if wcol == g.BLACK && black_player == HUMAN || wcol == g.WHITE && white_player == HUMAN:
 		confetti_count_down = 5.0
 		$FakeConfettiParticles._set_emitting(true)
