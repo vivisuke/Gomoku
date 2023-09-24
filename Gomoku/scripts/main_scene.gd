@@ -46,6 +46,7 @@ var beta
 var best_pos
 var start_msec = 0
 var print_count = 0
+var b_confirm = true
 
 func _ready():
 	#rng.randomize()		# Setups a time-based seed
@@ -58,6 +59,7 @@ func _ready():
 	#bd.put_color(6, 5, g.WHITE)
 	$HBC/UndoButton.disabled = true
 	$Board/SearchCursor.position = Vector2(-10, -10)*CELL_WD
+	$ConfirmButton.set_pressed_no_signal(b_confirm)
 	update_view()
 	init_labels()
 	unit_test()
@@ -282,7 +284,7 @@ func _input(event):
 				return		# 盤面外の場合
 			if !bd.is_empty(pos.x, pos.y): return
 			#print(pos)
-			if true:
+			if b_confirm:
 				cur_pos = pos
 				$Board/SearchCursor.position = pos*CELL_WD
 			else:
@@ -948,5 +950,9 @@ func _on_last_button_pressed():
 		bd.put_color(put_pos.x, put_pos.y, next_color)
 		next_color = (g.BLACK + g.WHITE) - next_color
 	update_view()
-
-
+func _on_confirm_button_toggled(button_pressed):
+	b_confirm = button_pressed
+	$PlaceButton.disabled = !b_confirm
+	$Board/SearchCursor.position = Vector2(-10, -10)*CELL_WD
+	cur_pos = Vector2i(-1, -1)
+	pass # Replace with function body.
