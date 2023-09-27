@@ -189,7 +189,7 @@
 0184 ● C 09/26            │ToDo│N_DIAGONAL 値を N_HORZ から計算するように
 0185 ● C 09/26            │ToDo│斜め配列中央インデックスにシンボル割り当て
 0186 ◎ C 09/27 09/27 0.007│ToDo│xyToDrIxMask()、xyToUrIxMask()：数値→シンボル
-0187 ● C 09/27            │ToDo│
+0187 ◎ C 09/27 09/27 0.007│ToDo│xyToDrIxMask()、xyToUrIxMask() 単体テスト：数値→シンボル
 0188 ● C 09/27            │ToDo│
 0189 ● C 09/27            │ToDo│
 0190 ● C 09/27            │ToDo│
