@@ -7,7 +7,8 @@ enum {
 }
 const N_HORZ = 11
 const N_VERT = 11
-const N_DIAGONAL = 6 + 1 + 6		# 斜め方向ビットマップ配列数
+#const N_DIAGONAL = 6 + 1 + 6		# 斜め方向ビットマップ配列数
+var N_DIAGONAL = N_HORZ*2 - 4*2 - 1		# 斜め方向ビットマップ配列数
 
 const ALPHA = -99999
 const BETA = 99999
@@ -87,6 +88,8 @@ class Board:
 	const IX_B42 = 5		# 両端空四個数インデックス
 	const IX_W42 = 6		# 両端空四個数インデックス
 	#var nput
+	var N_DIAGONAL = N_HORZ*2 - 4*2 - 1		# 斜め方向ビットマップ配列数
+	var CDX = (N_DIAGONAL - 1) / 2
 	var verbose = false
 	var n_space				# 空欄数
 	var n_calc_eval = 0		# 評価ノード数
@@ -233,7 +236,7 @@ class Board:
 		d_eval.fill(0)
 		
 
-	#  5  6    12
+	#  6  7    12
 	#	┌────────┐→x
 	#   │＼＼…＼        │  
 	#   │＼＼    ＼      │  
@@ -246,14 +249,14 @@ class Board:
 	#   └────────┘  
 	#   ↓y
 	func xyToDrIxMask(x, y) -> Array:	# return [ix, mask, nbit]
-		var ix = x - y + 6
-		if ix < 0 || ix > 12: return [-1, 0]
-		if ix <= 6:
-			return [ix, 1<<(g.N_HORZ-1-x+(ix-6)), 5+ix]
+		var ix = x - y + CDX
+		if ix < 0 || ix >= N_DIAGONAL: return [-1, 0]
+		if ix <= CDX:
+			return [ix, 1<<(g.N_HORZ-1-x+(ix-CDX)), CDX-1+ix]
 		else:
-			return [ix, 1<<(g.N_HORZ-1-y-(ix-6)), 17-ix]
+			return [ix, 1<<(g.N_HORZ-1-y-(ix-CDX)), N_DIAGONAL+4-ix]
 
-	#             0         5
+	#             0         6
 	#	┌────────┐→x
 	#   │        ／…／／│  
 	#   │      ／    ／／│  
@@ -266,12 +269,12 @@ class Board:
 	#   └────────┘  
 	#   ↓y
 	func xyToUrIxMask(x, y) -> Array:	# return [ix, mask, nbit]
-		var ix = x + y - 10 + 6
-		if ix < 0 || ix > 12: return [-1, 0]
-		if ix <= 6:
-			return [ix, 1<<(g.N_HORZ-1-x+(ix-6)), 5+ix]
+		var ix = x + y - 10 + CDX
+		if ix < 0 || ix >= N_DIAGONAL: return [-1, 0]
+		if ix <= CDX:
+			return [ix, 1<<(g.N_HORZ-1-x+(ix-CDX)), CDX-1+ix]
 		else:
-			return [ix, 1<<(y-(ix-6)), 17-ix]
+			return [ix, 1<<(y-(ix-CDX)), N_DIAGONAL+4-ix]
 	func is_empty(x, y):	# h_black, h_white のみを参照
 		var mask = 1 << (N_HORZ - 1 - x)
 		return h_black[y]&mask == 0 && h_white[y]&mask == 0

@@ -12,7 +12,8 @@ const N_FWD_PRUNING_NODE = 30
 var N_HORZ = g.N_HORZ
 var N_VERT = g.N_VERT
 var N_CELLS = N_HORZ*N_VERT
-const N_DIAGONAL = 6 + 1 + 6		# 斜め方向ビットマップ配列数
+#const N_DIAGONAL = 6 + 1 + 6		# 斜め方向ビットマップ配列数
+var N_DIAGONAL = N_HORZ*2 - 4*2 - 1		# 斜め方向ビットマップ配列数
 
 var BOARD_ORG_X
 var BOARD_ORG_Y
@@ -46,9 +47,27 @@ var beta
 var best_pos
 var start_msec = 0
 var print_count = 0
-var b_confirm = true
+var to_confirm = true
+var saved_data = {}			# 自動保存データ
 
+const AutoSaveFileName	= "user://Gomoku_autosave.dat"		# 自動保存ファイル
+
+func auto_load():
+	if !FileAccess.file_exists(AutoSaveFileName):
+		saved_data = {}
+	else:
+		var file = FileAccess.open(AutoSaveFileName, FileAccess.READ)
+		saved_data = file.get_var()
+		file.close()
+	return saved_data
+func auto_save():
+	saved_data["to_confirm"] = to_confirm
+	var file = FileAccess.open(AutoSaveFileName, FileAccess.WRITE)
+	file.store_var(saved_data)
+	file.close()
 func _ready():
+	print("N_DIAGONAL = ", N_DIAGONAL)
+	auto_load()
 	#rng.randomize()		# Setups a time-based seed
 	rng.seed = 0		# 固定乱数系列
 	BOARD_ORG_X = $Board/TileMap.global_position.x
@@ -59,7 +78,9 @@ func _ready():
 	#bd.put_color(6, 5, g.WHITE)
 	$HBC/UndoButton.disabled = true
 	$Board/SearchCursor.position = Vector2(-10, -10)*CELL_WD
-	$ConfirmButton.set_pressed_no_signal(b_confirm)
+	if saved_data.has("to_confirm"):
+		to_confirm = saved_data["to_confirm"]
+	$ConfirmButton.set_pressed_no_signal(to_confirm)
 	update_view()
 	init_labels()
 	unit_test()
@@ -284,7 +305,7 @@ func _input(event):
 				return		# 盤面外の場合
 			if !bd.is_empty(pos.x, pos.y): return
 			#print(pos)
-			if b_confirm:
+			if to_confirm:
 				cur_pos = pos
 				$Board/SearchCursor.position = pos*CELL_WD
 			else:
@@ -952,8 +973,9 @@ func _on_last_button_pressed():
 		next_color = (g.BLACK + g.WHITE) - next_color
 	update_view()
 func _on_confirm_button_toggled(button_pressed):
-	b_confirm = button_pressed
-	$PlaceButton.disabled = !b_confirm
+	to_confirm = button_pressed
+	auto_save()
+	$PlaceButton.disabled = !to_confirm
 	$Board/SearchCursor.position = Vector2(-10, -10)*CELL_WD
 	cur_pos = Vector2i(-1, -1)
 	pass # Replace with function body.
